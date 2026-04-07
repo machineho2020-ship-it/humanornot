@@ -414,6 +414,8 @@
             <button class="mode-tab" id="grammarTab" onclick="setMode('grammar')">✅ Grammar</button>
             <button class="mode-tab" id="sumTab" onclick="setMode('sum')">📋 Summarize</button>
             <button class="mode-tab" id="citeTab" onclick="setMode('cite')">📚 Cite</button>
+            <button class="mode-tab" id="readTab" onclick="setMode('read')">📊 Readability</button>
+            <button class="mode-tab" id="humanTab" onclick="setMode('human')">🌀 Humanizer</button>
             <button class="mode-tab" id="imageTab" onclick="setMode('image')">🖼️ Image <span style="font-size:0.6em;background:#fef3c7;color:#92400e;padding:2px 5px;border-radius:4px;font-weight:700;">PRO</span></button>
         </div>
         <div class="card-body">
@@ -499,18 +501,47 @@
                 </div>
             </div>
 
+            <!-- HUMANIZER PANEL -->
+            <div id="humanPanel" class="file-upload-wrap" style="display:none;">
+                <div class="textarea-wrap">
+                    <textarea id="humanInput" placeholder="Paste AI-generated text here to rewrite it as a human would write..."></textarea>
+                </div>
+                <div style="margin-top:12px;">
+                    <div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px;font-weight:600;">Humanization Level:</div>
+                    <div class="sum-length-btns">
+                        <button class="sum-len-btn" onclick="setHumanLen('light', this)">Light</button>
+                        <button class="sum-len-btn active" onclick="setHumanLen('medium', this)">Medium</button>
+                        <button class="sum-len-btn" onclick="setHumanLen('strong', this)">Strong</button>
+                    </div>
+                </div>
+                <div class="action-row" style="margin-top:12px;">
+                    <div class="limits">🌀 Make AI text sound human — free, no API needed</div>
+                    <button class="btn-scan" id="runHumanizeBtn" onclick="runHumanize()" style="background:#10b981;box-shadow:0 4px 12px rgba(16,185,129,0.3);">🌀 Humanize Now</button>
+                </div>
+            </div>
+
+            <!-- READABILITY PANEL -->
+            <div id="readPanel" class="file-upload-wrap" style="display:none;">
+                <div class="textarea-wrap">
+                    <textarea id="readInput" placeholder="Paste text to analyze readability, sentence complexity, and writing quality..."></textarea>
+                </div>
+                <div class="char-count"><span id="readCharCount">0</span> characters</div>
+                <div class="action-row" style="margin-top:12px;">
+                    <div class="limits">📊 Flesch-Kincaid · Coleman-Liau · SMOG · Sentence Analysis</div>
+                    <button class="btn-scan" onclick="runReadability()">Analyze Writing</button>
+                </div>
+            </div>
+
             <!-- FILE PANEL -->
             <div id="filePanel" class="file-upload-wrap">
                 <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
-                    <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.txt" onchange="handleFile(this.files[0])">
+                    <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.txt" onchange="handleFile(this.files)" multiple>
                     <div class="file-drop-icon">📄</div>
-                    <div class="file-drop-text">Drag & drop or <span>browse</span></div>
-                    <div class="file-drop-hint">PDF · DOCX · TXT · Max 5MB</div>
+                    <div class="file-drop-text">Drag & drop or <span>browse</span> · Multiple files supported</div>
+                    <div class="file-drop-hint">PDF · DOCX · TXT · Max 10 files · Max 5MB each</div>
                 </div>
-                <div class="file-name" id="fileName">
-                    <span id="fileNameText"></span>
-                    <button onclick="clearFile()" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:1rem;">✕</button>
-                </div>
+                <div id="batchFileList" style="display:none;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+                <div id="fileCount" style="font-size:0.8rem;color:var(--muted);margin-bottom:8px;display:none;"></div>
             </div>
 
             <!-- IMAGE PANEL -->
@@ -626,6 +657,8 @@
         document.getElementById('grammarPanel').style.display = m === 'grammar' ? 'flex' : 'none';
         document.getElementById('sumPanel').style.display = m === 'sum' ? 'flex' : 'none';
         document.getElementById('citePanel').style.display = m === 'cite' ? 'flex' : 'none';
+        document.getElementById('readPanel').style.display = m === 'read' ? 'flex' : 'none';
+        document.getElementById('humanPanel').style.display = m === 'human' ? 'flex' : 'none';
         document.getElementById('imagePanel').style.display = m === 'image' ? 'flex' : 'none';
         document.getElementById('textTab').classList.toggle('active', m === 'text');
         document.getElementById('fileTab').classList.toggle('active', m === 'file');
@@ -633,22 +666,35 @@
         document.getElementById('grammarTab').classList.toggle('active', m === 'grammar');
         document.getElementById('sumTab').classList.toggle('active', m === 'sum');
         document.getElementById('citeTab').classList.toggle('active', m === 'cite');
+        document.getElementById('readTab').classList.toggle('active', m === 'read');
+        document.getElementById('humanTab').classList.toggle('active', m === 'human');
         document.getElementById('imageTab').classList.toggle('active', m === 'image');
         document.getElementById('result').classList.remove('show');
     }
 
-    function handleFile(file) {
-        if (!file) return;
-        selectedFile = file;
-        document.getElementById('fileNameText').textContent = '📄 ' + file.name;
-        document.getElementById('fileName').classList.add('show');
+    let selectedFiles = [];
+
+    function handleFile(files) {
+        if (!files || files.length === 0) return;
+        selectedFiles = Array.from(files).slice(0, 10);
+        const list = document.getElementById('batchFileList');
+        const countEl = document.getElementById('fileCount');
+        let html = '';
+        selectedFiles.forEach((f, i) => {
+            html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg);border-radius:8px;font-size:0.85rem;">📄 ${f.name} <span style="color:var(--muted);font-size:0.75rem;">(${(f.size/1024).toFixed(0)}KB)</span></div>`;
+        });
+        list.innerHTML = html;
+        list.style.display = 'flex';
+        countEl.textContent = `${selectedFiles.length} file(s) selected`;
+        countEl.style.display = 'block';
         scanBtn.disabled = false;
     }
 
     function clearFile() {
-        selectedFile = null;
+        selectedFiles = [];
         document.getElementById('fileInput').value = '';
-        document.getElementById('fileName').classList.remove('show');
+        document.getElementById('batchFileList').style.display = 'none';
+        document.getElementById('fileCount').style.display = 'none';
         scanBtn.disabled = textarea.value.length < 50;
     }
 
@@ -715,10 +761,30 @@
                 showResult(data, text);
             } catch (e) { showResultError('Connection error. Please try again.'); }
         } else if (mode === 'file') {
-            if (!selectedFile) { alert('Please select a file first.'); loader.classList.remove('show'); scanBtn.disabled = false; return; }
-            loaderText.textContent = 'Parsing document...';
-            const formData = new FormData();
-            formData.append('file', selectedFile);
+            if (selectedFiles.length === 0) { alert('Please select file(s) first.'); loader.classList.remove('show'); scanBtn.disabled = false; return; }
+            loaderText.textContent = selectedFiles.length > 1 ? `Processing ${selectedFiles.length} files...` : 'Parsing document...';
+
+            if (selectedFiles.length > 1) {
+                // Batch mode
+                const formData = new FormData();
+                selectedFiles.forEach(f => formData.append('files', f));
+                try {
+                    const resp = await fetch('/batch-detect', { method: 'POST', body: formData });
+                    const data = await resp.json();
+                    if (data.error) { showResultError(data.error, resp.status); return; }
+                    renderBatchResult(data);
+                } catch (e) { showResultError('Connection error. Please try again.'); }
+            } else {
+                // Single file
+                const formData = new FormData();
+                formData.append('file', selectedFiles[0]);
+                try {
+                    const resp = await fetch('/detect/file', { method: 'POST', body: formData });
+                    const data = await resp.json();
+                    if (data.error) { showResultError(data.error, resp.status); return; }
+                    showResult(data, data.file_name || selectedFiles[0].name);
+                } catch (e) { showResultError('Connection error. Please try again.'); }
+            }
             try {
                 const resp = await fetch('/detect/file', { method: 'POST', body: formData });
                 const data = await resp.json();
@@ -808,7 +874,7 @@
                             <button class="level-btn" onclick="setParaLevel('strong', this)">Strong</button>
                         </div>
                     </div>
-                    <button class="btn-scan" id="humanizeBtn" onclick="runHumanize('${mode}')" style="width:100%;margin-top:8px;background:#10b981;box-shadow:0 4px 12px rgba(16,185,129,0.3);">
+                    <button class="btn-scan" id="humanizeBtn" onclick="runParaphrase('${mode}')" style="width:100%;margin-top:8px;background:#10b981;box-shadow:0 4px 12px rgba(16,185,129,0.3);">
                         🔄 Humanize This Text
                     </button>
                     <div id="paraVariants" class="para-variants" style="display:none;"></div>
@@ -840,7 +906,7 @@
         btn.classList.add('active');
     }
 
-    async function runHumanize(sourceMode) {
+    async function runParaphrase(sourceMode) {
         let text = '';
         if (sourceMode === 'text') {
             text = textarea.value.trim();
@@ -1179,6 +1245,230 @@
             ta.remove();
             alert('Copied!');
         });
+    }
+
+    // ===== BATCH RESULT =====
+    function renderBatchResult(data) {
+        hideLoader();
+        const resultDiv = document.getElementById('result');
+        const results = data.results || [];
+        let html = `
+            <div class="verdict-card">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                    <div style="font-size:2.5rem;">📄</div>
+                    <div>
+                        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);">Batch Results</h2>
+                        <p style="font-size:0.85rem;color:var(--muted);margin-top:2px;">${results.length} files analyzed · ${data.remaining} checks remaining</p>
+                    </div>
+                </div>`;
+
+        results.forEach(r => {
+            const isAi = r.verdict === 'AI-Generated';
+            const color = isAi ? 'var(--ai)' : 'var(--human)';
+            if (r.error) {
+                html += `
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border-radius:10px;margin-bottom:8px;border:1px solid var(--border);">
+                        <div><span style="font-weight:600;">📄 ${r.filename}</span> <span style="color:var(--ai);font-size:0.8rem;">⚠️ ${r.error}</span></div>
+                    </div>`;
+            } else {
+                html += `
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border-radius:10px;margin-bottom:8px;border:1px solid var(--border);">
+                        <div>
+                            <span style="font-weight:700;">📄 ${r.filename}</span>
+                            <span style="font-size:0.75rem;color:var(--muted);margin-left:8px;">${r.word_count} words</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <span style="font-size:0.8rem;"><span style="color:var(--human);font-weight:700;">${r.human_pct}%</span> human</span>
+                            <span style="font-size:0.8rem;"><span style="color:var(--ai);font-weight:700;">${r.ai_pct}%</span> AI</span>
+                            <span style="font-weight:700;font-size:0.85rem;color:${color};">${r.verdict}</span>
+                        </div>
+                    </div>`;
+            }
+        });
+
+        html += `</div>`;
+        resultDiv.innerHTML = html;
+        resultDiv.classList.add('show');
+    }
+
+    // ===== READABILITY =====
+    async function runReadability() {
+        const text = document.getElementById('readInput').value.trim();
+        if (!text || text.length < 30) { alert('Please enter at least 30 characters.'); return; }
+        showLoader('Analyzing readability...');
+        try {
+            const resp = await fetch('/readability', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            });
+            const data = await resp.json();
+            hideLoader();
+            if (data.error) { showResultError(data.error); return; }
+            renderReadabilityResult(data);
+        } catch (e) { hideLoader(); showResultError('Connection error.'); }
+    }
+
+    function renderReadabilityResult(data) {
+        const resultDiv = document.getElementById('result');
+        const fk = data.readability.flesch_kincaid;
+        const cl = data.readability.coleman_liau;
+        const smog = data.readability.smog;
+        const breakdown = data.sentence_breakdown;
+
+        const gradeColors = {
+            'Very Easy': '#10b981', 'Easy': '#34d399', 'Moderate': '#f59e0b',
+            'Difficult': '#f97316', 'Very Difficult': '#ef4444'
+        };
+
+        let issuesHtml = '';
+        if (data.issues && data.issues.length > 0) {
+            data.issues.forEach(issue => {
+                issuesHtml += `<div class="issue-item">${issue}</div>`;
+            });
+        }
+
+        let repeatedHtml = '';
+        if (data.repeated_words && data.repeated_words.length > 0) {
+            data.repeated_words.forEach(rw => {
+                repeatedHtml += `<span style="display:inline-block;padding:3px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:0.75rem;margin:2px;">"${rw.word}" ×${rw.count}</span>`;
+            });
+        }
+
+        resultDiv.innerHTML = `
+            <div class="verdict-card">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                    <div style="font-size:2.5rem;">📊</div>
+                    <div>
+                        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);">Writing Analysis</h2>
+                        <p style="font-size:0.85rem;color:var(--muted);">${data.overall_label} · Grade ${data.avg_grade_level}</p>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="val">${data.total_words}</div>
+                        <div class="lbl">Words</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="val">${data.total_sentences}</div>
+                        <div class="lbl">Sentences</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="val">${data.unique_ratio}%</div>
+                        <div class="lbl">Unique Words</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="val">${data.avg_sentence_length}</div>
+                        <div class="lbl">Avg Sentence Len</div>
+                    </div>
+                </div>
+
+                <h3 style="font-size:0.85rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin:16px 0 10px;">Readability Scores</h3>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
+                    <div class="score-bar">
+                        <div class="score-row"><span>Flesch-Kincaid</span><span style="font-weight:700;">${fk.reading_ease}/100</span></div>
+                        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">${fk.label}</div>
+                        <div class="bar-bg"><div class="bar-fill-h" style="width:${fk.reading_ease}%"></div></div>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-row"><span>Coleman-Liau</span><span style="font-weight:700;">Grade ${cl.grade}</span></div>
+                        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">${cl.label}</div>
+                        <div class="bar-bg"><div class="bar-fill-ai" style="width:${Math.min(cl.grade * 5, 100)}%"></div></div>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-row"><span>SMOG Index</span><span style="font-weight:700;">Grade ${smog.grade}</span></div>
+                        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">${smog.label}</div>
+                        <div class="bar-bg"><div class="bar-fill-h" style="width:${Math.min(smog.grade * 5, 100)}%"></div></div>
+                    </div>
+                </div>
+
+                <h3 style="font-size:0.85rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin:16px 0 10px;">Sentence Complexity</h3>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
+                    <div style="background:#d1fae5;border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:1.5rem;font-weight:800;color:#059669;">${breakdown.short}</div>
+                        <div style="font-size:0.7rem;color:#065f46;text-transform:uppercase;margin-top:4px;">Short (≤10w)</div>
+                    </div>
+                    <div style="background:#fef3c7;border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:1.5rem;font-weight:800;color:#d97706;">${breakdown.medium}</div>
+                        <div style="font-size:0.7rem;color:#92400e;text-transform:uppercase;margin-top:4px;">Medium (11-20w)</div>
+                    </div>
+                    <div style="background:#fee2e2;border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:1.5rem;font-weight:800;color:#dc2626;">${breakdown.long}</div>
+                        <div style="font-size:0.7rem;color:#991b1b;text-transform:uppercase;margin-top:4px;">Long (>20w)</div>
+                    </div>
+                </div>
+
+                ${repeatedHtml ? `<h3 style="font-size:0.85rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;">Repeated Words</h3><div style="margin-bottom:16px;">${repeatedHtml}</div>` : ''}
+
+                ${issuesHtml ? `<h3 style="font-size:0.85rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;">Suggestions</h3>${issuesHtml}` : '<div style="text-align:center;padding:16px;color:var(--human);font-weight:700;">✅ No major issues found!</div>'}
+            </div>`;
+        resultDiv.classList.add('show');
+    }
+
+    // ===== HUMANIZER =====
+    let humanLevel = 'medium';
+    const humanInput = document.getElementById('humanInput');
+
+    function setHumanLen(len, btn) {
+        humanLevel = len;
+        document.querySelectorAll('#humanPanel .sum-len-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    async function runHumanize() {
+        const text = humanInput.value.trim();
+        if (!text || text.length < 20) { alert('Please enter some text to humanize.'); return; }
+        showLoader('Rewriting as human...');
+        try {
+            const resp = await fetch('/humanize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text, level: humanLevel })
+            });
+            const data = await resp.json();
+            hideLoader();
+            if (data.error) { showResultError(data.error); return; }
+            renderHumanizeResult(data);
+        } catch (e) { hideLoader(); showResultError('Connection error.'); } finally {
+            btn.disabled = false;
+            btn.textContent = '🌀 Humanize Now';
+        }
+    }
+
+    function renderHumanizeResult(data) {
+        const resultDiv = document.getElementById('result');
+        const variants = data.variants || [];
+        const levelLabel = { light: 'Light', medium: 'Medium', strong: 'Strong' }[humanLevel];
+
+        let variantsHtml = '';
+        variants.forEach((v, i) => {
+            variantsHtml += `
+                <div class="para-variant">
+                    <div class="variant-label">Variant ${i + 1} (${levelLabel})</div>
+                    <div id="humanVariant${i}">${v}</div>
+                    <div style="display:flex;gap:6px;margin-top:8px;">
+                        <button onclick="copyToClipboard('${v.replace(/'/g, "\\'").replace(/\n/g, ' ')}')" style="padding:5px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:0.75rem;cursor:pointer;font-family:inherit;">📋 Copy</button>
+                        <button onclick="humanInput.value='${v.replace(/'/g, "\\'").replace(/\n/g, ' ')}';humanInput.dispatchEvent(new Event('input'))" style="padding:5px 12px;background:var(--accent);border:none;border-radius:6px;font-size:0.75rem;color:#fff;cursor:pointer;font-family:inherit;font-weight:600;">✏️ Edit & Humanize Again</button>
+                    </div>
+                </div>`;
+        });
+
+        resultDiv.innerHTML = `
+            <div class="verdict-card">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                    <div style="font-size:2.5rem;">🌀</div>
+                    <div>
+                        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);">Humanized Output</h2>
+                        <p style="font-size:0.85rem;color:var(--muted);margin-top:2px;">3 different rewrites · ${levelLabel} level · No AI model used</p>
+                    </div>
+                </div>
+                <div class="para-variants">${variantsHtml}</div>
+                <div style="margin-top:12px;padding:12px;background:#d1fae5;border:1px solid #6ee7b7;border-radius:10px;font-size:0.8rem;color:#065f46;">
+                    💡 <strong>Tip:</strong> After humanizing, run the result through <strong>AI Detection</strong> to verify it now scores as human-written.
+                </div>
+            </div>`;
+        resultDiv.classList.add('show');
     }
 
     function showLoader(msg) {

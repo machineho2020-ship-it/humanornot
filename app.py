@@ -484,6 +484,112 @@ def summarize():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/batch-detect", methods=["POST"])
+def batch_detect():
+    """Process multiple text files at once."""
+    ip = get_client_ip()
+    remaining = check_rate_limit(ip)
+
+    if remaining <= 0:
+        return jsonify({"error": "Daily limit reached", "upgrade_url": "/upgrade"}), 429
+
+    results = []
+    files = request.files.getlist("files")
+    if not files or len(files) == 0:
+        return jsonify({"error": "No files provided"}), 400
+    if len(files) > 10:
+        return jsonify({"error": "Maximum 10 files at a time"}), 400
+
+    hf_headers = {"Authorization": f"Bearer {HF_API_KEY}", "Accept": "application/json"} if HF_API_KEY else {"Accept": "application/json"}
+
+    for file in files:
+        filename = file.filename or "unknown"
+        ext = filename.lower().split('.')[-1]
+
+        try:
+            if ext == 'pdf':
+                text = extract_text_from_pdf(file.stream)
+            elif ext in ('docx', 'doc'):
+                text = extract_text_from_docx(file.stream)
+            elif ext in ('txt', 'text'):
+                text = file.read().decode('utf-8', errors='ignore')
+            else:
+                results.append({"filename": filename, "error": "Unsupported file type"})
+                continue
+
+            text = text.strip()
+            if len(text) < 50:
+                results.append({"filename": filename, "error": "File content too short (min 50 chars)"})
+                continue
+            if len(text) > 3000:
+                text = text[:3000]
+
+            payload = {"inputs": text}
+            resp = requests.post(HF_API_URL, json=payload, headers=hf_headers, timeout=30)
+            if resp.status_code == 503:
+                time.sleep(2)
+                resp = requests.post(HF_API_URL, json=payload, headers=hf_headers, timeout=30)
+
+            if resp.ok:
+                data = resp.json()
+                if isinstance(data, list) and len(data) > 0:
+                    items = data[0] if isinstance(data[0], list) else data
+                    human_score = next((i.get("score", 0) for i in items if "real" in i.get("label", "").lower() or "human" in i.get("label", "").lower()), 0)
+                    ai_score = next((i.get("score", 0) for i in items if "fake" in i.get("label", "").lower() or "ai" in i.get("label", "").lower()), 0)
+                    results.append({
+                        "filename": filename,
+                        "ai_pct": round(ai_score * 100, 1),
+                        "human_pct": round(human_score * 100, 1),
+                        "verdict": "AI-Generated" if ai_score > human_score else "Human-Written",
+                        "confidence": round(max(ai_score, human_score) * 100, 1),
+                        "word_count": len(text.split()),
+                    })
+            else:
+                results.append({"filename": filename, "error": f"API error: {resp.status_code}"})
+        except Exception as e:
+            results.append({"filename": filename, "error": str(e)})
+
+    record_use(ip)
+    return jsonify({"status": "success", "results": results, "remaining": check_rate_limit(ip)})
+
+
+@app.route("/readability", methods=["POST"])
+def readability():
+    """Enhanced readability analysis with multiple metrics."""
+    text = request.json.get("text", "").strip()
+    if not text or len(text) < 30:
+        return jsonify({"error": "Text too short (minimum 30 characters)"}), 400
+    try:
+        from readability import analyze_writing_v2
+        result = analyze_writing_v2(text)
+        return jsonify({"status": "success", **result})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/humanize", methods=["POST"])
+def humanize_route():
+    """Rewrite AI text to sound more human."""
+    ip = get_client_ip()
+    text = request.json.get("text", "").strip()
+    level = request.json.get("level", "medium")
+    if not text or len(text) < 20:
+        return jsonify({"error": "Text too short"}), 400
+    if level not in ('light', 'medium', 'strong'):
+        level = 'medium'
+    try:
+        from humanizer import humanize, humanize_multiple
+        variants = humanize_multiple(text, n_variants=3, level=level)
+        return jsonify({
+            "status": "success",
+            "original": text,
+            "variants": variants,
+            "level": level,
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/cite", methods=["POST"])
 def cite():
     """Generate citations from URL or DOI."""
