@@ -4,20 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HumanOrNot — AI Content Detector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg: #0d0d0f;
-            --surface: #16161a;
-            --border: #2a2a35;
-            --text: #f0f0f5;
-            --muted: #6b6b80;
-            --accent: #ff6b6b;
-            --accent2: #feca57;
-            --human: #00b894;
-            --ai: #e17055;
-            --pro-bg: #1a1a2e;
-            --pro-border: #feca57;
+            --bg: #f8f9fc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #1a1a2e;
+            --muted: #64748b;
+            --accent: #3b82f6;
+            --accent-dark: #2563eb;
+            --accent-light: #eff6ff;
+            --human: #10b981;
+            --ai: #ef4444;
+            --pro-bg: #fffbeb;
+            --pro-border: #f59e0b;
+            --radius: 16px;
+            --shadow: 0 4px 24px rgba(0,0,0,0.06);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
         }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -26,100 +32,178 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            -webkit-font-smoothing: antialiased;
         }
+        /* Nav */
+        nav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-logo {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-logo span { color: var(--accent); }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .nav-links a:hover { color: var(--text); background: var(--bg); }
+        .nav-cta {
+            background: var(--accent) !important;
+            color: #fff !important;
+            padding: 8px 18px !important;
+            border-radius: 10px !important;
+            font-weight: 600 !important;
+        }
+        .nav-cta:hover { background: var(--accent-dark) !important; }
+
+        /* Hero */
         .hero {
             text-align: center;
-            padding: 40px 20px 30px;
-            background: linear-gradient(180deg, #12121a 0%, var(--bg) 100%);
-            border-bottom: 1px solid var(--border);
+            padding: 60px 20px 40px;
+            max-width: 640px;
+            margin: 0 auto;
         }
         .hero-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: var(--pro-bg);
-            border: 1px solid var(--pro-border);
-            color: var(--accent2);
-            font-size: 0.7rem;
+            background: var(--accent-light);
+            color: var(--accent);
+            font-size: 0.75rem;
             font-weight: 700;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 20px;
-            margin-bottom: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #dbeafe;
         }
         .hero h1 {
-            font-size: 2.2rem;
+            font-size: 2.6rem;
             font-weight: 800;
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
+            line-height: 1.15;
+            color: var(--text);
+            margin-bottom: 14px;
+            letter-spacing: -0.02em;
+        }
+        .hero h1 em {
+            font-style: normal;
+            color: var(--accent);
         }
         .hero p {
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: var(--muted);
             max-width: 480px;
             margin: 0 auto;
-            line-height: 1.5;
+            line-height: 1.6;
         }
+
+        /* Container */
         .container {
-            max-width: 640px;
+            max-width: 720px;
             margin: 0 auto;
-            padding: 24px 16px;
-            flex: 1;
+            padding: 0 20px 60px;
             width: 100%;
-        }
-        .mode-toggle {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-        .mode-btn {
             flex: 1;
-            padding: 10px;
+        }
+
+        /* Input Card */
+        .input-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--muted);
-            font-size: 0.85rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .card-header {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+        }
+        .mode-tab {
+            flex: 1;
+            padding: 14px 20px;
+            text-align: center;
+            font-size: 0.9rem;
             font-weight: 600;
+            color: var(--muted);
             cursor: pointer;
+            border: none;
+            background: none;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-bottom: 2px solid transparent;
         }
-        .mode-btn.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: #000;
+        .mode-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            background: var(--surface);
         }
-        .textarea-wrap {
-            position: relative;
-            margin-bottom: 16px;
-        }
+        .card-body { padding: 24px; }
+
+        /* Textarea */
+        .textarea-wrap { position: relative; }
         textarea {
             width: 100%;
             height: 180px;
-            background: var(--surface);
-            border: 1px solid var(--border);
+            border: 1.5px solid var(--border);
             border-radius: 12px;
-            color: var(--text);
+            padding: 14px 16px;
             font-size: 0.95rem;
-            padding: 14px;
+            font-family: inherit;
             resize: vertical;
-            transition: border-color 0.3s;
-            line-height: 1.6;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            line-height: 1.7;
+            background: var(--bg);
+            color: var(--text);
         }
         textarea:focus {
             outline: none;
-            border-color: var(--accent2);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(59,130,246,0.1);
+            background: var(--surface);
         }
-        textarea::placeholder { color: var(--muted); }
+        textarea::placeholder { color: #94a3b8; }
         .char-count {
-            text-align: right;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
             font-size: 0.78rem;
             color: var(--muted);
-            margin-top: 6px;
         }
+        .char-count .limit { color: #ef4444; font-weight: 600; }
+        .char-count .ok { color: var(--human); font-weight: 600; }
+
+        /* Upload Area */
         .upload-area {
             display: none;
             flex-direction: column;
@@ -127,124 +211,142 @@
             justify-content: center;
             gap: 12px;
             padding: 32px;
-            background: var(--surface);
             border: 2px dashed var(--border);
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
-            margin-bottom: 16px;
+            background: var(--bg);
         }
         .upload-area.dragover, .upload-area:hover {
-            border-color: var(--accent2);
-            background: rgba(254, 202, 87, 0.05);
+            border-color: var(--accent);
+            background: var(--accent-light);
         }
-        .upload-area input {
-            display: none;
-        }
-        .upload-icon {
-            font-size: 2rem;
-        }
-        .upload-text {
-            font-size: 0.9rem;
-            color: var(--muted);
-        }
-        .upload-text span {
-            color: var(--accent2);
-            font-weight: 600;
-        }
+        .upload-area input { display: none; }
+        .upload-icon { font-size: 2rem; }
+        .upload-text { font-size: 0.9rem; color: var(--muted); }
+        .upload-text span { color: var(--accent); font-weight: 600; }
         .preview-img {
             max-width: 100%;
-            max-height: 250px;
+            max-height: 200px;
             border-radius: 8px;
             display: none;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            border: none;
-            border-radius: 10px;
-            color: #000;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: opacity 0.3s, transform 0.1s;
+
+        /* Action Row */
+        .action-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 16px;
+            gap: 12px;
         }
-        .btn:hover { opacity: 0.88; }
-        .btn:active { transform: scale(0.98); }
-        .btn:disabled { opacity: 0.45; cursor: not-allowed; }
         .limits {
-            text-align: center;
-            margin-top: 14px;
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             color: var(--muted);
         }
-        .limits a { color: var(--accent2); text-decoration: none; font-weight: 600; }
+        .limits a { color: var(--accent); text-decoration: none; font-weight: 600; }
+        .btn-scan {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            background: var(--accent);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+        }
+        .btn-scan:hover {
+            background: var(--accent-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(59,130,246,0.35);
+        }
+        .btn-scan:active { transform: translateY(0); }
+        .btn-scan:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loader */
         .loader {
             display: none;
             text-align: center;
-            padding: 24px;
+            padding: 32px;
         }
         .loader.show { display: block; }
         .spinner {
             width: 36px; height: 36px;
             border: 3px solid var(--border);
-            border-top-color: var(--accent2);
+            border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
-            margin: 0 auto 10px;
+            margin: 0 auto 12px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .result {
-            margin-top: 24px;
-            display: none;
-        }
+        .loader p { color: var(--muted); font-size: 0.9rem; }
+
+        /* Result */
+        .result { display: none; margin-top: 24px; }
         .result.show { display: block; }
-        .verdict {
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: 800;
-            padding: 18px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            letter-spacing: -0.01em;
-        }
-        .verdict.human {
-            background: linear-gradient(135deg, var(--human), #00cec9);
-            color: #fff;
-        }
-        .verdict.ai {
-            background: linear-gradient(135deg, var(--ai), #fdcb6e);
-            color: #fff;
-        }
-        .verdict.error {
-            background: var(--surface);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            font-size: 1rem;
-        }
-        .verdict.pro {
-            background: linear-gradient(135deg, var(--pro-bg), #1a1a2e);
-            border: 1px solid var(--pro-border);
-            color: var(--accent2);
-            font-size: 1.1rem;
-        }
-        .score-bar {
+        .verdict-card {
             background: var(--surface);
             border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            text-align: center;
+        }
+        .verdict-emoji { font-size: 3rem; margin-bottom: 8px; }
+        .verdict-label {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .verdict-label.human { color: var(--human); }
+        .verdict-label.ai { color: var(--ai); }
+        .verdict-sub {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 20px;
+        }
+        .verdict-pro {
+            background: var(--pro-bg);
+            border: 1px solid var(--pro-border);
+            color: #92400e;
+            font-size: 0.85rem;
+            padding: 10px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+        .verdict-pro a { color: var(--pro-border); font-weight: 700; }
+
+        /* Score Bars */
+        .score-bars {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .score-bar {
+            background: var(--bg);
             border-radius: 12px;
             padding: 16px;
-            margin-bottom: 10px;
         }
         .score-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
+            font-weight: 600;
         }
         .bar-bg {
             width: 100%;
@@ -255,13 +357,13 @@
         }
         .bar-fill-h {
             height: 100%;
-            background: linear-gradient(90deg, var(--human), #00cec9);
+            background: linear-gradient(90deg, #10b981, #34d399);
             border-radius: 4px;
             transition: width 0.8s ease;
         }
         .bar-fill-ai {
             height: 100%;
-            background: linear-gradient(90deg, var(--ai), #fdcb6e);
+            background: linear-gradient(90deg, #ef4444, #f87171);
             border-radius: 4px;
             transition: width 0.8s ease;
         }
@@ -269,78 +371,165 @@
             text-align: center;
             color: var(--muted);
             font-size: 0.8rem;
-            margin-top: 8px;
+            margin-top: 12px;
         }
         .remaining {
             text-align: center;
             color: var(--muted);
             font-size: 0.75rem;
-            margin-top: 8px;
+            margin-top: 6px;
         }
+
+        /* Features */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 32px;
+        }
+        .feature {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+        }
+        .feature-icon { font-size: 1.8rem; margin-bottom: 8px; }
+        .feature h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
+        .feature p { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+        /* Footer */
         footer {
             text-align: center;
-            padding: 20px;
-            color: #333;
-            font-size: 0.75rem;
+            padding: 24px;
+            color: var(--muted);
+            font-size: 0.78rem;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
         }
-        footer a { color: var(--accent2); text-decoration: none; }
-        @media (max-width: 480px) {
-            .hero h1 { font-size: 1.8rem; }
-            .container { padding: 16px 12px; }
-            textarea { height: 150px; }
+        footer a { color: var(--accent); text-decoration: none; }
+
+        /* Error */
+        .error-msg {
+            text-align: center;
+            padding: 20px;
+            color: var(--ai);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 2rem; }
+            .features { grid-template-columns: 1fr; }
+            .score-bars { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
         }
     </style>
 </head>
 <body>
 
+<nav>
+    <a href="/" class="nav-logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3b82f6" stroke-width="2.5"/><path d="M8 12l3 3 5-5" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Human<span>Or</span>Not
+    </a>
+    <div class="nav-links">
+        <a href="#">How it works</a>
+        <a href="#">For Educators</a>
+        <a href="/upgrade" class="nav-cta">Upgrade to Pro</a>
+    </div>
+</nav>
+
 <div class="hero">
-    <div class="hero-badge">🔥 PRO</div>
-    <h1>HumanOrNot</h1>
-    <p>Instantly detect if content was written by a human or AI. Paste text or upload an image.</p>
+    <div class="hero-badge">🔬 AI Detection</div>
+    <h1>Is it <em>human</em> or <em>AI</em>?</h1>
+    <p>Detect AI-generated text instantly. Built for students, educators, and researchers who value authenticity.</p>
 </div>
 
 <div class="container">
-    <div class="mode-toggle">
-        <button class="mode-btn active" id="textModeBtn" onclick="setMode('text')">✏️ Text</button>
-        <button class="mode-btn" id="imageModeBtn" onclick="setMode('image')">🖼️ Image</button>
-    </div>
-
-    <div id="textPanel">
-        <div class="textarea-wrap">
-            <textarea id="textInput" placeholder="Paste text here (minimum 50 characters)..."></textarea>
-            <div class="char-count"><span id="charCount">0</span> characters</div>
+    <div class="input-card">
+        <div class="card-header">
+            <button class="mode-tab active" id="textTab" onclick="setMode('text')">
+                ✏️ Text Detection
+            </button>
+            <button class="mode-tab" id="imageTab" onclick="setMode('image')">
+                🖼️ Image Detection <span style="font-size:0.7em;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:6px;font-weight:700;">PRO</span>
+            </button>
         </div>
-        <button class="btn" id="detectBtn" onclick="detectText()">Detect Now</button>
-    </div>
-
-    <div id="imagePanel" style="display:none;">
-        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-            <input type="file" id="fileInput" accept="image/*" onchange="handleFile(this.files[0])">
-            <div class="upload-icon">📷</div>
-            <div class="upload-text">Drag & drop or <span>browse</span> to upload</div>
-            <div class="upload-text" style="font-size:0.75rem;margin-top:4px;">JPG, PNG, GIF · Max 5MB</div>
+        <div class="card-body">
+            <div id="textPanel">
+                <div class="textarea-wrap">
+                    <textarea id="textInput" placeholder="Paste text here to detect AI-generated content... (minimum 50 characters)"></textarea>
+                </div>
+                <div class="char-count">
+                    <span id="charStatus"></span>
+                    <span id="charInfo"><span id="charCount">0</span> / 5,000</span>
+                </div>
+            </div>
+            <div id="imagePanel" style="display:none;">
+                <img id="previewImg" class="preview-img" alt="Preview">
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" accept="image/*" onchange="handleFile(this.files[0])">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">Drag & drop or <span>browse</span> to upload</div>
+                    <div class="upload-text" style="font-size:0.75rem;">JPG, PNG, GIF, WEBP · Max 5MB</div>
+                </div>
+            </div>
+            <div class="action-row">
+                <div class="limits" id="limits">Free: 10 checks/day · <a href="/upgrade">Upgrade →</a></div>
+                <button class="btn-scan" id="scanBtn" onclick="detectText()">
+                    🔍 Scan Now
+                </button>
+            </div>
         </div>
-        <img id="previewImg" class="preview-img" alt="Preview">
-        <button class="btn" id="imageDetectBtn" onclick="detectImage()">Detect from Image</button>
     </div>
-
-    <div class="limits" id="limits">Free: 10 checks/day · <a href="/upgrade">Upgrade for unlimited →</a></div>
 
     <div class="loader" id="loader">
         <div class="spinner"></div>
-        <p style="color:var(--muted);font-size:0.85rem;">Analyzing...</p>
+        <p>Analyzing text...</p>
     </div>
 
     <div class="result" id="result">
-        <div class="verdict" id="verdict"></div>
-        <div id="scores"></div>
-        <div class="confidence" id="confidence"></div>
-        <div class="remaining" id="remaining"></div>
+        <div class="verdict-card">
+            <div class="verdict-emoji" id="verdictEmoji">✅</div>
+            <div class="verdict-label" id="verdictLabel">Human-Written</div>
+            <div class="verdict-sub" id="verdictSub">This content appears to be written by a real person.</div>
+            <div class="score-bars">
+                <div class="score-bar">
+                    <div class="score-row"><span>✅ Human</span><span id="humanPct">0%</span></div>
+                    <div class="bar-bg"><div class="bar-fill-h" id="barH" style="width:0%"></div></div>
+                </div>
+                <div class="score-bar">
+                    <div class="score-row"><span>🤖 AI</span><span id="aiPct">0%</span></div>
+                    <div class="bar-bg"><div class="bar-fill-ai" id="barAI" style="width:0%"></div></div>
+                </div>
+            </div>
+            <div class="confidence" id="confidence">Confidence: 0%</div>
+            <div class="remaining" id="remaining">0 checks remaining</div>
+        </div>
+    </div>
+
+    <div class="features">
+        <div class="feature">
+            <div class="feature-icon">⚡</div>
+            <h3>Instant Results</h3>
+            <p>Get accurate AI detection in seconds. No waiting, no friction.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">🎓</div>
+            <h3>For Education</h3>
+            <p>Built for students writing papers and lecturers verifying authenticity.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">🔒</div>
+            <h3>Private & Secure</h3>
+            <p>Your text is never stored. Detection happens in real-time only.</p>
+        </div>
     </div>
 </div>
 
 <footer>
-    Powered by <a href="https://huggingface.co">Hugging Face</a> · <a href="/upgrade">Upgrade to PRO</a>
+    Powered by Hugging Face · <a href="/upgrade">Upgrade to Pro</a> for unlimited checks
 </footer>
 
 <script>
@@ -349,10 +538,23 @@
 
     const textarea = document.getElementById('textInput');
     const charCount = document.getElementById('charCount');
+    const charStatus = document.getElementById('charStatus');
+    const scanBtn = document.getElementById('scanBtn');
     const uploadArea = document.getElementById('uploadArea');
 
     textarea.addEventListener('input', () => {
-        charCount.textContent = textarea.value.length;
+        const len = textarea.value.length;
+        charCount.textContent = len;
+        if (len < 50 && len > 0) {
+            charStatus.innerHTML = '<span class="limit">Need 50+ characters</span>';
+            scanBtn.disabled = true;
+        } else if (len === 0) {
+            charStatus.textContent = '';
+            scanBtn.disabled = false;
+        } else {
+            charStatus.innerHTML = '<span class="ok">✓ Ready</span>';
+            scanBtn.disabled = false;
+        }
     });
 
     uploadArea.addEventListener('dragover', (e) => {
@@ -372,9 +574,9 @@
     function setMode(m) {
         mode = m;
         document.getElementById('textPanel').style.display = m === 'text' ? 'block' : 'none';
-        document.getElementById('imagePanel').style.display = m === 'image' ? 'block' : 'none';
-        document.getElementById('textModeBtn').classList.toggle('active', m === 'text');
-        document.getElementById('imageModeBtn').classList.toggle('active', m === 'image');
+        document.getElementById('imagePanel').style.display = m === 'image' ? 'flex' : 'none';
+        document.getElementById('textTab').classList.toggle('active', m === 'text');
+        document.getElementById('imageTab').classList.toggle('active', m === 'image');
         document.getElementById('result').classList.remove('show');
     }
 
@@ -391,16 +593,15 @@
 
     async function detectText() {
         const text = textarea.value.trim();
-        const btn = document.getElementById('detectBtn');
         const loader = document.getElementById('loader');
         const result = document.getElementById('result');
 
         if (text.length < 50) {
-            showError('Please enter at least 50 characters.');
+            alert('Please enter at least 50 characters.');
             return;
         }
 
-        btn.disabled = true;
+        scanBtn.disabled = true;
         loader.classList.add('show');
         result.classList.remove('show');
 
@@ -420,27 +621,25 @@
                 }
                 return;
             }
-
             renderResult(data);
         } catch (e) {
             showError('Connection error. Please try again.');
         } finally {
-            btn.disabled = false;
+            scanBtn.disabled = false;
             loader.classList.remove('show');
         }
     }
 
     async function detectImage() {
-        const btn = document.getElementById('imageDetectBtn');
         const loader = document.getElementById('loader');
         const result = document.getElementById('result');
 
         if (!selectedFile) {
-            showError('Please upload an image first.');
+            alert('Please upload an image first.');
             return;
         }
 
-        btn.disabled = true;
+        scanBtn.disabled = true;
         loader.classList.add('show');
         result.classList.remove('show');
 
@@ -453,80 +652,60 @@
                 body: formData
             });
             const data = await resp.json();
-
             if (data.error) {
-                if (resp.status === 429) {
-                    showUpgrade(data.message);
-                } else {
-                    showError(data.error);
-                }
+                if (resp.status === 429) showUpgrade(data.message);
+                else showError(data.error);
                 return;
             }
-
             renderResult(data);
         } catch (e) {
             showError('Connection error. Please try again.');
         } finally {
-            btn.disabled = false;
+            scanBtn.disabled = false;
             loader.classList.remove('show');
         }
     }
 
     function renderResult(data) {
+        const isHuman = data.human_pct > data.ai_pct;
+        const emoji = isHuman ? '✅' : '🤖';
+        const labelClass = isHuman ? 'human' : 'ai';
+        const label = isHuman ? 'Human-Written' : 'AI-Generated';
+        const sub = isHuman
+            ? `This content appears to be written by a real person.`
+            : `This content appears to be generated by an AI.`;
+
         document.getElementById('humanPct').textContent = data.human_pct + '%';
         document.getElementById('aiPct').textContent = data.ai_pct + '%';
         document.getElementById('barH').style.width = data.human_pct + '%';
         document.getElementById('barAI').style.width = data.ai_pct + '%';
         document.getElementById('confidence').textContent = `Confidence: ${data.confidence}%`;
-        document.getElementById('remaining').textContent = `${data.remaining} checks remaining today`;
+        document.getElementById('remaining').textContent = `${data.remaining} of 10 free checks remaining today`;
 
-        const verdictEl = document.getElementById('verdict');
-        verdictEl.textContent = data.verdict;
-        verdictEl.className = 'verdict ' + (data.ai_pct > data.human_pct ? 'ai' : 'human');
+        document.getElementById('verdictEmoji').textContent = emoji;
+        document.getElementById('verdictLabel').textContent = label;
+        document.getElementById('verdictLabel').className = 'verdict-label ' + labelClass;
+        document.getElementById('verdictSub').textContent = sub;
 
         result.classList.add('show');
     }
 
     function showError(msg) {
-        const result = document.getElementById('result');
-        const verdictEl = document.getElementById('verdict');
-        verdictEl.textContent = '⚠️ ' + msg;
-        verdictEl.className = 'verdict error';
-        document.getElementById('scores').innerHTML = '';
-        document.getElementById('confidence').textContent = '';
-        document.getElementById('remaining').textContent = '';
-        result.classList.add('show');
+        document.getElementById('result').innerHTML =
+            `<div class="verdict-card"><div class="error-msg">⚠️ ${msg}</div></div>`;
+        document.getElementById('result').classList.add('show');
     }
 
     function showUpgrade(msg) {
-        const result = document.getElementById('result');
-        const verdictEl = document.getElementById('verdict');
-        verdictEl.innerHTML = '🔒 ' + (msg || 'Daily limit reached') + '<br><a href="/upgrade" style="color:#feca57;font-size:0.85rem;text-decoration:underline;">Upgrade to PRO →</a>';
-        verdictEl.className = 'verdict pro';
-        document.getElementById('scores').innerHTML = '';
-        document.getElementById('confidence').textContent = '';
-        document.getElementById('remaining').textContent = '';
-        result.classList.add('show');
+        document.getElementById('result').innerHTML = `
+            <div class="verdict-card">
+                <div class="verdict-pro">
+                    🔒 ${msg || 'Daily limit reached'} · <a href="/upgrade">Upgrade to Pro →</a>
+                </div>
+            </div>`;
+        document.getElementById('result').classList.add('show');
     }
 </script>
-
-<!-- Result score bars (hidden until result shown) -->
-<div id="scores" style="display:none;">
-    <div class="score-bar">
-        <div class="score-row">
-            <span>✅ Human</span>
-            <span id="humanPct">0%</span>
-        </div>
-        <div class="bar-bg"><div class="bar-fill-h" id="barH" style="width:0%"></div></div>
-    </div>
-    <div class="score-bar">
-        <div class="score-row">
-            <span>🤖 AI-Generated</span>
-            <span id="aiPct">0%</span>
-        </div>
-        <div class="bar-bg"><div class="bar-fill-ai" id="barAI" style="width:0%"></div></div>
-    </div>
-</div>
 
 </body>
 </html>
