@@ -64,7 +64,7 @@ def detect():
 
     record_use(ip)
 
-    headers = {"Authorization": f"Bearer {HF_API_KEY}"} if HF_API_KEY else {}
+    headers = {"Authorization": f"Bearer {HF_API_KEY}", "Accept": "application/json"} if HF_API_KEY else {"Accept": "application/json"}
 
     try:
         payload = {"inputs": text}
@@ -150,7 +150,7 @@ def detect_image():
         b64 = base64.b64encode(img_bytes).decode()
         payload = {"inputs": {"image": b64}}
 
-        headers = {"Authorization": f"Bearer {HF_API_KEY}"} if HF_API_KEY else {}
+        headers = {"Authorization": f"Bearer {HF_API_KEY}", "Accept": "application/json"} if HF_API_KEY else {"Accept": "application/json"}
         resp = requests.post(HF_IMAGE_API_URL, json=payload, headers=headers, timeout=30)
 
         if resp.ok:
