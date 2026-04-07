@@ -3,6 +3,7 @@ import requests
 import os
 import time
 import base64
+import re
 from collections import defaultdict
 from datetime import datetime, timedelta
 
@@ -133,7 +134,7 @@ def detect_image():
         return jsonify({"error": "No image file provided"}), 400
 
     file = request.files['file']
-    if not file.filename.lower().match(r'.*\.(jpg|jpeg|png|gif|webp)$'):
+    if not re.match(r'.*\.(jpg|jpeg|png|gif|webp)$', file.filename.lower()):
         return jsonify({"error": "Unsupported file type. Use JPG, PNG, GIF, or WEBP."}), 400
 
     record_use(ip)
