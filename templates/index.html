@@ -314,6 +314,63 @@
         .para-variant .use-btn { position: absolute; top: 10px; right: 10px; padding: 4px 10px; background: var(--human); border: none; border-radius: 6px; color: #fff; font-size: 0.7rem; font-weight: 700; cursor: pointer; opacity: 0; transition: opacity 0.2s; font-family: inherit; }
         .para-variant:hover .use-btn { opacity: 1; }
         .para-loading { text-align: center; padding: 16px; color: var(--muted); font-size: 0.85rem; }
+
+        /* Writing Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+        .stat-card { background: var(--bg); border-radius: 10px; padding: 14px 12px; text-align: center; }
+        .stat-card .val { font-size: 1.4rem; font-weight: 800; color: var(--text); }
+        .stat-card .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+        .stat-card.accent .val { color: var(--accent); }
+        .stat-card.green .val { color: var(--human); }
+        .stat-card.red .val { color: var(--ai); }
+        .readability-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; background: var(--accent-light); color: var(--accent); border: 1px solid #dbeafe; margin-top: 8px; }
+        .tone-badge { display: inline-block; padding: 3px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; background: var(--bg); border: 1px solid var(--border); color: var(--muted); margin-top: 8px; }
+        .issue-item { display: flex; gap: 8px; align-items: flex-start; padding: 10px 14px; background: #fffbeb; border: 1px solid #f59e0b; border-radius: 8px; font-size: 0.85rem; color: #92400e; margin-bottom: 8px; }
+        .issue-item::before { content: '💡'; flex-shrink: 0; }
+
+        /* Grammar */
+        .grammar-issue { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+        .grammar-issue .gi-msg { font-size: 0.9rem; font-weight: 600; color: var(--ai); margin-bottom: 4px; }
+        .grammar-issue .gi-short { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+        .grammar-issue .gi-context { background: var(--bg); padding: 8px 10px; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; border-left: 3px solid var(--ai); margin-bottom: 8px; }
+        .grammar-issue .gi-type { display: inline-block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--muted); background: var(--bg); padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; }
+        .grammar-issue .gi-fix { display: inline-block; padding: 3px 10px; background: var(--human-light); border: 1px solid var(--human); border-radius: 6px; font-size: 0.75rem; font-weight: 700; color: var(--human); margin-right: 4px; }
+        .grammar-summary { display: flex; gap: 16px; margin-bottom: 16px; }
+        .grammar-summary .gs-item { flex: 1; background: var(--bg); border-radius: 10px; padding: 14px; text-align: center; }
+        .grammar-summary .gs-val { font-size: 1.5rem; font-weight: 800; }
+        .grammar-summary .gs-val.ok { color: var(--human); }
+        .grammar-summary .gs-val.err { color: var(--ai); }
+        .grammar-summary .gs-lbl { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+
+        /* Vocabulary */
+        .vocab-risk { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .vocab-risk.high { background: #fee2e2; color: var(--ai); border: 1px solid #fca5a5; }
+        .vocab-risk.medium { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
+        .vocab-risk.low { background: var(--human-light); color: var(--human); border: 1px solid #6ee7b7; }
+        .vocab-phrase { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; }
+        .vocab-phrase .vp-phrase { font-weight: 700; font-size: 0.9rem; color: var(--text); }
+        .vocab-phrase .vp-freq { font-size: 0.75rem; font-weight: 700; color: var(--ai); background: #fee2e2; padding: 2px 8px; border-radius: 6px; }
+        .vocab-phrase .vp-example { font-size: 0.8rem; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+        .vocab-phrase .vp-example strong { color: var(--ai); }
+
+        /* Citation */
+        .cite-inputs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+        .cite-inputs input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.9rem; font-family: inherit; background: var(--bg); transition: border-color 0.3s; }
+        .cite-inputs input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+        .cite-format-btns { display: flex; gap: 6px; margin-bottom: 16px; }
+        .cite-fmt-btn { padding: 6px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .cite-fmt-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .cite-result { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 10px; position: relative; }
+        .cite-result .cr-format { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+        .cite-result .cr-text { font-size: 0.875rem; line-height: 1.7; color: var(--text); }
+        .cite-copy { position: absolute; top: 12px; right: 12px; padding: 3px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; font-size: 0.7rem; font-weight: 600; color: var(--muted); cursor: pointer; font-family: inherit; }
+        .cite-copy:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* Summarize */
+        .sum-length-btns { display: flex; gap: 6px; margin-bottom: 16px; }
+        .sum-len-btn { padding: 6px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .sum-len-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .sum-result { background: var(--accent-light); border: 1px solid #dbeafe; border-radius: 12px; padding: 18px; font-size: 0.95rem; line-height: 1.8; color: var(--text); }
         .stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
         @media (max-width: 600px) {
@@ -345,15 +402,19 @@
 <div class="hero">
     <div class="hero-badge">🔬 AI Detection</div>
     <h1>Is it <em>human</em> or <em>AI</em>?</h1>
-    <p>Detect AI-generated text instantly. Built for students, educators, and researchers who value authenticity.</p>
+    <p>AI detection + Grammar + Summarizer + Citations — all in one free tool for students and educators.</p>
 </div>
 
 <div class="container">
     <div class="input-card">
         <div class="card-header">
-            <button class="mode-tab active" id="textTab" onclick="setMode('text')">✏️ Text</button>
+            <button class="mode-tab active" id="textTab" onclick="setMode('text')">✏️ Detect</button>
             <button class="mode-tab" id="fileTab" onclick="setMode('file')">📄 Document</button>
-            <button class="mode-tab" id="imageTab" onclick="setMode('image')">🖼️ Image <span style="font-size:0.65em;background:#fef3c7;color:#92400e;padding:2px 5px;border-radius:5px;font-weight:700;">PRO</span></button>
+            <button class="mode-tab" id="vocabTab" onclick="setMode('vocab')">📝 Vocabulary</button>
+            <button class="mode-tab" id="grammarTab" onclick="setMode('grammar')">✅ Grammar</button>
+            <button class="mode-tab" id="sumTab" onclick="setMode('sum')">📋 Summarize</button>
+            <button class="mode-tab" id="citeTab" onclick="setMode('cite')">📚 Cite</button>
+            <button class="mode-tab" id="imageTab" onclick="setMode('image')">🖼️ Image <span style="font-size:0.6em;background:#fef3c7;color:#92400e;padding:2px 5px;border-radius:4px;font-weight:700;">PRO</span></button>
         </div>
         <div class="card-body">
             <!-- TEXT PANEL -->
@@ -373,6 +434,68 @@
                 <div class="char-count">
                     <span id="charStatus"></span>
                     <span><span id="charCount">0</span> characters</span>
+                </div>
+            </div>
+
+            <!-- VOCABULARY PANEL -->
+            <div id="vocabPanel" class="file-upload-wrap" style="display:none;">
+                <div class="textarea-wrap">
+                    <textarea id="vocabInput" placeholder="Paste text to scan for AI vocabulary patterns..."></textarea>
+                </div>
+                <div class="char-count"><span id="vocabCharCount">0</span> characters · Scans for 60+ common AI phrases</div>
+                <div class="action-row" style="margin-top:12px;">
+                    <div class="limits">🔍 AI Vocabulary Scanner</div>
+                    <button class="btn-scan" onclick="runVocab()">Scan Vocabulary</button>
+                </div>
+            </div>
+
+            <!-- GRAMMAR PANEL -->
+            <div id="grammarPanel" class="file-upload-wrap" style="display:none;">
+                <div class="textarea-wrap">
+                    <textarea id="grammarInput" placeholder="Paste text to check for grammar and spelling errors..."></textarea>
+                </div>
+                <div class="char-count"><span id="grammarCharCount">0</span> characters · Powered by LanguageTool</div>
+                <div class="action-row" style="margin-top:12px;">
+                    <div class="limits">✅ Grammar & Spelling Check</div>
+                    <button class="btn-scan" onclick="runGrammar()">Check Grammar</button>
+                </div>
+            </div>
+
+            <!-- SUMMARIZE PANEL -->
+            <div id="sumPanel" class="file-upload-wrap" style="display:none;">
+                <div class="textarea-wrap">
+                    <textarea id="sumInput" placeholder="Paste article or long text to summarize..."></textarea>
+                </div>
+                <div class="char-count"><span id="sumCharCount">0</span> characters · AI-powered summarization</div>
+                <div style="margin-top:12px;">
+                    <div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px;font-weight:600;">Summary Length:</div>
+                    <div class="sum-length-btns">
+                        <button class="sum-len-btn" onclick="setSumLen('short', this)">Short</button>
+                        <button class="sum-len-btn active" onclick="setSumLen('medium', this)">Medium</button>
+                        <button class="sum-len-btn" onclick="setSumLen('long', this)">Detailed</button>
+                    </div>
+                </div>
+                <div class="action-row" style="margin-top:12px;">
+                    <div class="limits">📋 AI Summarizer</div>
+                    <button class="btn-scan" onclick="runSummarize()">Summarize</button>
+                </div>
+            </div>
+
+            <!-- CITE PANEL -->
+            <div id="citePanel" class="file-upload-wrap" style="display:none;">
+                <div class="cite-inputs">
+                    <input type="url" id="citeUrlInput" placeholder="Paste article or webpage URL..." style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;font-family:inherit;background:var(--bg);">
+                </div>
+                <div class="cite-format-btns">
+                    <button class="cite-fmt-btn active" onclick="setCiteFormat('apa', this)">APA</button>
+                    <button class="cite-fmt-btn" onclick="setCiteFormat('mla', this)">MLA</button>
+                    <button class="cite-fmt-btn" onclick="setCiteFormat('chicago', this)">Chicago</button>
+                    <button class="cite-fmt-btn" onclick="setCiteFormat('all', this)">All Formats</button>
+                </div>
+                <div id="citeResults"></div>
+                <div class="action-row" style="margin-top:12px;">
+                    <div class="limits">📚 Citation Generator</div>
+                    <button class="btn-scan" onclick="runCite()">Generate Citation</button>
                 </div>
             </div>
 
@@ -418,25 +541,40 @@
 
     <div class="features">
         <div class="feature">
-            <div class="feature-icon">⚡</div>
-            <h3>Instant Results</h3>
-            <p>Get accurate AI detection in seconds. No waiting, no friction.</p>
+            <div class="feature-icon">🔍</div>
+            <h3>AI Detection</h3>
+            <p>Detect AI-generated text with 85%+ accuracy. Sentence-level highlighting.</p>
         </div>
         <div class="feature">
-            <div class="feature-icon">🎓</div>
-            <h3>For Education</h3>
-            <p>Built for students writing papers and lecturers verifying authenticity.</p>
+            <div class="feature-icon">📝</div>
+            <h3>AI Vocabulary</h3>
+            <p>Scan for 60+ common AI phrases. Know if writing sounds formulaic.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">✅</div>
+            <h3>Grammar Check</h3>
+            <p>Grammar, spelling, and style suggestions powered by LanguageTool.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">📋</div>
+            <h3>AI Summarizer</h3>
+            <p>Condense long articles into clear, concise summaries in seconds.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">📚</div>
+            <h3>Citation Generator</h3>
+            <p>Instantly generate APA, MLA, and Chicago citations from any URL.</p>
         </div>
         <div class="feature">
             <div class="feature-icon">🔒</div>
             <h3>Private & Secure</h3>
-            <p>Your text is never stored. Detection happens in real-time only.</p>
+            <p>Your text is never stored. All processing happens in real-time only.</p>
         </div>
     </div>
 </div>
 
 <footer>
-    Powered by Hugging Face · <a href="/upgrade">Upgrade to Pro</a> for unlimited checks
+    Powered by Hugging Face & LanguageTool · <a href="/upgrade">Upgrade to Pro</a> for unlimited checks
 </footer>
 
 <script>
@@ -484,9 +622,17 @@
         mode = m;
         document.getElementById('textPanel').style.display = m === 'text' ? 'block' : 'none';
         document.getElementById('filePanel').style.display = m === 'file' ? 'flex' : 'none';
+        document.getElementById('vocabPanel').style.display = m === 'vocab' ? 'flex' : 'none';
+        document.getElementById('grammarPanel').style.display = m === 'grammar' ? 'flex' : 'none';
+        document.getElementById('sumPanel').style.display = m === 'sum' ? 'flex' : 'none';
+        document.getElementById('citePanel').style.display = m === 'cite' ? 'flex' : 'none';
         document.getElementById('imagePanel').style.display = m === 'image' ? 'flex' : 'none';
         document.getElementById('textTab').classList.toggle('active', m === 'text');
         document.getElementById('fileTab').classList.toggle('active', m === 'file');
+        document.getElementById('vocabTab').classList.toggle('active', m === 'vocab');
+        document.getElementById('grammarTab').classList.toggle('active', m === 'grammar');
+        document.getElementById('sumTab').classList.toggle('active', m === 'sum');
+        document.getElementById('citeTab').classList.toggle('active', m === 'cite');
         document.getElementById('imageTab').classList.toggle('active', m === 'image');
         document.getElementById('result').classList.remove('show');
     }
@@ -767,9 +913,296 @@
         if (!variant) return;
         textarea.value = variant;
         textarea.dispatchEvent(new Event('input'));
-        // Scroll to textarea
         textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
         textarea.focus();
+    }
+
+    // ===== VOCABULARY =====
+    const vocabInput = document.getElementById('vocabInput');
+    vocabInput.addEventListener('input', () => {
+        document.getElementById('vocabCharCount').textContent = vocabInput.value.length;
+    });
+
+    async function runVocab() {
+        const text = vocabInput.value.trim();
+        if (!text || text.length < 30) { alert('Please enter at least 30 characters.'); return; }
+        const resultDiv = document.getElementById('result');
+        showLoader('Scanning for AI vocabulary...');
+        try {
+            const resp = await fetch('/vocabulary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            });
+            const data = await resp.json();
+            hideLoader();
+            if (data.error) { showResultError(data.error); return; }
+            renderVocabResult(data, text);
+        } catch (e) { hideLoader(); showResultError('Connection error.'); }
+    }
+
+    function renderVocabResult(data, originalText) {
+        const resultDiv = document.getElementById('result');
+        const riskClass = data.risk_level === 'High' ? 'high' : data.risk_level === 'Medium' ? 'medium' : 'low';
+        const phrases = data.phrases_found || [];
+        let phrasesHtml = '';
+        if (phrases.length > 0) {
+            phrasesHtml = '<div style="margin-top:16px;">';
+            phrases.forEach(p => {
+                phrasesHtml += `
+                    <div class="vocab-phrase">
+                        <div class="vp-header">
+                            <span class="vp-phrase">${p.phrase}</span>
+                            <span class="vp-freq">${p.frequency} more common in AI</span>
+                        </div>
+                        <div class="vp-example">${p.highlighted}</div>
+                    </div>`;
+            });
+            phrasesHtml += '</div>';
+        }
+
+        resultDiv.innerHTML = `
+            <div class="verdict-card">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                    <div style="font-size:2.5rem;">🔍</div>
+                    <div>
+                        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);">AI Vocabulary Scan</h2>
+                        <p style="font-size:0.85rem;color:var(--muted);margin-top:2px;">${data.suggestion}</p>
+                    </div>
+                    <span class="vocab-risk ${riskClass}" style="margin-left:auto;">${data.risk_level} Risk</span>
+                </div>
+                <div class="score-bars">
+                    <div class="score-bar">
+                        <div class="score-row"><span>🎯 Unique AI Phrases</span><span>${data.unique_phrases}</span></div>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-row"><span>📊 Total Occurrences</span><span>${data.total_occurrences}</span></div>
+                    </div>
+                </div>
+                ${phrasesHtml}
+            </div>`;
+        resultDiv.classList.add('show');
+    }
+
+    // ===== GRAMMAR =====
+    const grammarInput = document.getElementById('grammarInput');
+    grammarInput.addEventListener('input', () => {
+        document.getElementById('grammarCharCount').textContent = grammarInput.value.length;
+    });
+
+    async function runGrammar() {
+        const text = grammarInput.value.trim();
+        if (!text || text.length < 10) { alert('Please enter some text to check.'); return; }
+        showLoader('Checking grammar and spelling...');
+        try {
+            const resp = await fetch('/grammar-check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            });
+            const data = await resp.json();
+            hideLoader();
+            if (data.error) { showResultError(data.error); return; }
+            renderGrammarResult(data);
+        } catch (e) { hideLoader(); showResultError('Connection error.'); }
+    }
+
+    function renderGrammarResult(data) {
+        const resultDiv = document.getElementById('result');
+        const issues = data.matches || [];
+        const hasIssues = issues.length > 0;
+
+        let issuesHtml = '';
+        if (issues.length > 0) {
+            issuesHtml = '<div style="margin-top:16px;">';
+            issues.slice(0, 20).forEach(issue => {
+                const ctx = issue.context || '';
+                const repls = (issue.replacements || []).map(r => `<span class="gi-fix">${r}</span>`).join('');
+                issuesHtml += `
+                    <div class="grammar-issue">
+                        <span class="gi-type">${issue.type}</span>
+                        <div class="gi-msg">${issue.short_message || issue.message}</div>
+                        <div class="gi-context">${ctx}</div>
+                        ${repls ? '<div>' + repls + '</div>' : ''}
+                    </div>`;
+            });
+            if (issues.length > 20) {
+                issuesHtml += `<div style="text-align:center;color:var(--muted);font-size:0.85rem;padding:10px;">+${issues.length - 20} more issues found</div>`;
+            }
+            issuesHtml += '</div>';
+        } else {
+            issuesHtml = '<div style="text-align:center;padding:24px;color:var(--human);font-weight:700;font-size:1.1rem;">✅ No grammar or spelling issues found!</div>';
+        }
+
+        resultDiv.innerHTML = `
+            <div class="verdict-card">
+                <div class="grammar-summary">
+                    <div class="gs-item">
+                        <div class="gs-val ${hasIssues ? 'err' : 'ok'}">${issues.length}</div>
+                        <div class="gs-lbl">Issues Found</div>
+                    </div>
+                    <div class="gs-item">
+                        <div class="gs-val">${data.text_length}</div>
+                        <div class="gs-lbl">Characters</div>
+                    </div>
+                    <div class="gs-item">
+                        <div class="gs-val ${hasIssues ? 'err' : 'ok'}">${hasIssues ? 'Needs Work' : 'Looks Great'}</div>
+                        <div class="gs-lbl">Overall</div>
+                    </div>
+                </div>
+                ${issuesHtml}
+            </div>`;
+        resultDiv.classList.add('show');
+    }
+
+    // ===== SUMMARIZE =====
+    let sumLen = 'medium';
+    const sumInput = document.getElementById('sumInput');
+    sumInput.addEventListener('input', () => {
+        document.getElementById('sumCharCount').textContent = sumInput.value.length;
+    });
+
+    function setSumLen(len, btn) {
+        sumLen = len;
+        document.querySelectorAll('.sum-len-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    async function runSummarize() {
+        const text = sumInput.value.trim();
+        if (!text || text.length < 50) { alert('Please enter at least 50 characters to summarize.'); return; }
+        showLoader('Generating summary...');
+        try {
+            const resp = await fetch('/summarize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text, length: sumLen })
+            });
+            const data = await resp.json();
+            hideLoader();
+            if (data.error) { showResultError(data.error); return; }
+            renderSumResult(data);
+        } catch (e) { hideLoader(); showResultError('Connection error.'); }
+    }
+
+    function renderSumResult(data) {
+        const resultDiv = document.getElementById('result');
+        const lenLabel = sumLen === 'short' ? 'Short (1-2 sentences)' : sumLen === 'long' ? 'Detailed' : 'Medium (3 sentences)';
+        resultDiv.innerHTML = `
+            <div class="verdict-card">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                    <div style="font-size:2.5rem;">📋</div>
+                    <div>
+                        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);">AI Summary</h2>
+                        <p style="font-size:0.85rem;color:var(--muted);margin-top:2px;">${lenLabel} · Original: ${data.original_length} chars</p>
+                    </div>
+                </div>
+                <div class="sum-result">${data.summary}</div>
+                <div style="margin-top:16px;display:flex;gap:8px;">
+                    <button onclick="copyToClipboard('${data.summary.replace(/'/g, "\\'").replace(/\n/g, ' ')}')" class="btn-scan" style="flex:1;background:var(--bg);color:var(--text);box-shadow:none;border:1px solid var(--border);">📋 Copy Summary</button>
+                    <button onclick="sumInput.value='${data.summary.replace(/'/g, "\\'").replace(/\n/g, ' ')}';sumInput.dispatchEvent(new Event('input''))" class="btn-scan" style="flex:1;">✏️ Edit & Improve</button>
+                </div>
+            </div>`;
+        resultDiv.classList.add('show');
+    }
+
+    // ===== CITATION =====
+    let citeFormat = 'apa';
+
+    function setCiteFormat(fmt, btn) {
+        citeFormat = fmt;
+        document.querySelectorAll('.cite-fmt-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    async function runCite() {
+        const url = document.getElementById('citeUrlInput').value.trim();
+        if (!url) { alert('Please enter a URL.'); return; }
+        showLoader('Fetching article info and generating citations...');
+        try {
+            const resp = await fetch('/cite', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url })
+            });
+            const data = await resp.json();
+            hideLoader();
+            if (data.error) { showResultError(data.error); return; }
+            renderCiteResult(data);
+        } catch (e) { hideLoader(); showResultError('Connection error.'); }
+    }
+
+    function renderCiteResult(data) {
+        const resultDiv = document.getElementById('result');
+        let formats = [];
+        if (citeFormat === 'all') {
+            formats = ['apa', 'mla', 'chicago'];
+        } else {
+            formats = [citeFormat];
+        }
+
+        let html = '';
+        formats.forEach(fmt => {
+            const text = data[fmt] || 'Could not generate this format.';
+            html += `
+                <div class="cite-result">
+                    <button class="cite-copy" onclick="copyToClipboard('${text.replace(/'/g, "\\'").replace(/\n/g, ' ')}')">Copy</button>
+                    <div class="cr-format">${fmt.toUpperCase()} Citation</div>
+                    <div class="cr-text">${text}</div>
+                </div>`;
+        });
+
+        resultDiv.innerHTML = `
+            <div class="verdict-card">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                    <div style="font-size:2.5rem;">📚</div>
+                    <div>
+                        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);">Citation Generated</h2>
+                        <p style="font-size:0.85rem;color:var(--muted);margin-top:2px;">Powered by CrossRef</p>
+                    </div>
+                </div>
+                ${html}
+            </div>`;
+        resultDiv.classList.add('show');
+    }
+
+    // ===== UTILS =====
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Copied!');
+        }).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+            alert('Copied!');
+        });
+    }
+
+    function showLoader(msg) {
+        const loader = document.getElementById('loader');
+        document.getElementById('loaderText').textContent = msg;
+        loader.classList.add('show');
+        document.getElementById('result').classList.remove('show');
+        document.getElementById('scanBtn').disabled = true;
+    }
+
+    function hideLoader() {
+        document.getElementById('loader').classList.remove('show');
+        document.getElementById('scanBtn').disabled = false;
+    }
+
+    function showResultError(msg, status) {
+        hideLoader();
+        const resultDiv = document.getElementById('result');
+        if (status === 429) {
+            resultDiv.innerHTML = `<div class="verdict-card"><div class="upgrade-msg">🔒 ${msg} · <a href="/upgrade">Upgrade to Pro →</a></div></div>`;
+        } else {
+            resultDiv.innerHTML = `<div class="verdict-card"><div class="error-msg">⚠️ ${msg}</div></div>`;
+        }
+        resultDiv.classList.add('show');
     }
 </script>
 

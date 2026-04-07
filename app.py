@@ -383,6 +383,123 @@ def detect_image():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/vocabulary", methods=["POST"])
+def vocabulary_scan():
+    """Scan text for AI vocabulary patterns."""
+    ip = get_client_ip()
+    text = request.json.get("text", "").strip()
+    if not text or len(text) < 30:
+        return jsonify({"error": "Text too short (minimum 30 characters)"}), 400
+    try:
+        from ai_vocabulary import scan_text_for_ai_vocabulary
+        result = scan_text_for_ai_vocabulary(text)
+        result["status"] = "success"
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/writing-stats", methods=["POST"])
+def writing_stats():
+    """Analyze writing: readability, tone, stats."""
+    ip = get_client_ip()
+    text = request.json.get("text", "").strip()
+    if not text or len(text) < 30:
+        return jsonify({"error": "Text too short (minimum 30 characters)"}), 400
+    try:
+        from writing_analyzer import analyze_writing
+        result = analyze_writing(text)
+        if not result:
+            return jsonify({"error": "Could not analyze text"}), 400
+        return jsonify({"status": "success", **result})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/grammar-check", methods=["POST"])
+def grammar_check():
+    """Check grammar using LanguageTool public API."""
+    ip = get_client_ip()
+    text = request.json.get("text", "").strip()
+    if not text or len(text) < 10:
+        return jsonify({"error": "Text too short"}), 400
+    if len(text) > 50000:
+        text = text[:50000]
+    try:
+        resp = requests.post(
+            "https://api.languagetool.org/v2/check",
+            data={
+                "text": text,
+                "language": "en-US",
+                "level": "default"
+            },
+            timeout=15
+        )
+        if resp.ok:
+            data = resp.json()
+            matches = []
+            for m in data.get("matches", []):
+                issues = []
+                for r in m.get("rule", {}).get("annotations", []):
+                    issues.append(r.get("value", m.get("message", "")))
+                matches.append({
+                    "message": m.get("message", ""),
+                    "short_message": m.get("shortMessage", ""),
+                    "offset": m.get("offset", {}).get("value", 0),
+                    "length": m.get("length", 0),
+                    "context": m.get("context", {}).get("text", ""),
+                    "type": m.get("type", {}).get("typeName", "Unknown"),
+                    "rule": m.get("rule", {}).get("id", ""),
+                    "replacements": [r.get("value", "") for r in m.get("replacements", [])[:3]],
+                })
+            return jsonify({
+                "status": "success",
+                "matches": matches,
+                "total_issues": len(matches),
+                "text_length": len(text)
+            })
+        else:
+            return jsonify({"error": f"Grammar API error: {resp.status_code}"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/summarize", methods=["POST"])
+def summarize():
+    """Summarize text using HuggingFace summarization model."""
+    ip = get_client_ip()
+    text = request.json.get("text", "").strip()
+    length = request.json.get("length", "medium")
+    if not text or len(text) < 50:
+        return jsonify({"error": "Text too short (minimum 50 characters)"}), 400
+    if len(text) > 3000:
+        text = text[:3000]
+    try:
+        from summarizer import summarize
+        result = summarize(text, length)
+        if not result:
+            return jsonify({"error": "Summarization failed"}), 500
+        return jsonify({"status": "success", "summary": result, "original_length": len(text)})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/cite", methods=["POST"])
+def cite():
+    """Generate citations from URL or DOI."""
+    ip = get_client_ip()
+    data = request.json or {}
+    url = data.get("url", "").strip()
+    if not url:
+        return jsonify({"error": "No URL provided"}), 400
+    try:
+        from citation_generator import generate_citations
+        citations = generate_citations(url)
+        return jsonify({"status": "success", **citations})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
