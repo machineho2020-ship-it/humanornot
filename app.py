@@ -14,6 +14,23 @@ try:
 except ImportError:
     PdfReader = None
 
+# Auto-download NLTK data on startup
+def _setup_nltk():
+    import nltk
+    for resource in ['wordnet', 'omw-1.4', 'averaged_perceptron_tagger', 'punkt']:
+        try:
+            nltk.data.find(f'corpora/{resource}')
+        except LookupError:
+            try:
+                nltk.download(resource, quiet=True)
+            except Exception:
+                pass
+
+try:
+    _setup_nltk()
+except Exception:
+    pass
+
 try:
     import docx
 except ImportError:
@@ -279,6 +296,58 @@ def detect_file():
         return jsonify({"error": str(e)}), 500
 
     return jsonify({"error": "Unknown error"}), 500
+
+@app.route("/paraphrase", methods=["POST"])
+def paraphrase():
+    """Paraphrase text to sound more naturally human-written."""
+    ip = get_client_ip()
+    remaining = check_rate_limit(ip)
+
+    if remaining <= 0:
+        return jsonify({
+            "error": "Daily limit reached",
+            "upgrade_url": "/upgrade"
+        }), 429
+
+    data = request.json or {}
+    text = data.get("text", "").strip()
+    level = data.get("level", "medium")  # light, medium, strong
+
+    if not text:
+        return jsonify({"error": "No text provided"}), 400
+
+    if len(text) < 20:
+        return jsonify({"error": "Text too short (minimum 20 characters)"}), 400
+
+    if len(text) > 5000:
+        text = text[:5000]
+
+    if level not in ('light', 'medium', 'strong'):
+        level = 'medium'
+
+    try:
+        from paraphrase import paraphrase, paraphrase_multiple
+        # Generate 3 variants at the requested level
+        variants = paraphrase_multiple(text, n_variants=3, level=level)
+        # Also provide one at each level
+        light = paraphrase(text, 'light')
+        strong = paraphrase(text, 'strong')
+
+        record_use(ip)
+
+        return jsonify({
+            "original": text,
+            "level": level,
+            "variants": variants,
+            "light": light,
+            "medium": variants[0] if variants else paraphrase(text, 'medium'),
+            "strong": strong,
+            "remaining": check_rate_limit(ip),
+            "status": "success"
+        })
+    except Exception as e:
+        return jsonify({"error": f"Paraphrasing failed: {str(e)}"}), 500
+
 
 @app.route("/detect/image", methods=["POST"])
 def detect_image():
