@@ -1,20 +1,183 @@
 """
-Pure Python rule-based paraphraser using NLTK WordNet + TextBlob.
-No external API needed — runs locally.
+Fully self-contained rule-based paraphraser.
+No external downloads needed — pure Python.
 """
 import random
 import re
-from textblob import TextBlob
 
-try:
-    import nltk
-    from nltk.corpus import wordnet as wn
-    _WN_OK = True
-except ImportError:
-    _WN_OK = False
+# Built-in synonym dictionary (common academic/formal words)
+SYNONYMS = {
+    # Verbs
+    "is": ["exists as", "remains", "stands as"],
+    "are": ["exist as", "remain", "stand as"],
+    "was": ["existed as", "proved to be"],
+    "shows": ["demonstrates", "exhibits", "reveals", "illustrates"],
+    "show": ["demonstrate", "exhibit", "reveal", "illustrate"],
+    "presents": ["offers", "introduces", "puts forward", "delivers"],
+    "present": ["offer", "introduce", "put forward", "deliver"],
+    "has": ["possesses", "contains", "carries", "holds"],
+    "have": ["possess", "contain", "carry", "hold"],
+    "makes": ["creates", "builds", "produces", "generates"],
+    "make": ["create", "build", "produce", "generate"],
+    "uses": ["utilizes", "employs", "applies", "adopts"],
+    "use": ["utilize", "employ", "apply", "adopt"],
+    "helps": ["assists", "supports", "aids", "enables"],
+    "help": ["assist", "support", "aid", "enable"],
+    "needs": ["requires", "demands", "necessitates"],
+    "need": ["require", "demand", "necessitate"],
+    "gives": ["provides", "offers", "supplies", "delivers"],
+    "give": ["provide", "offer", "supply", "deliver"],
+    "wants": ["desires", "seeks", "aims for", "wishes for"],
+    "want": ["desire", "seek", "aim for", "wish for"],
+    "asks": ["inquires", "questions", "queries", "poses"],
+    "ask": ["inquire", "question", "query", "pose"],
+    "thinks": ["believes", "considers", "reckons", "holds the view"],
+    "think": ["believe", "consider", "reckon", "hold the view"],
+    "uses": ["utilizes", "employs", "applies"],
+    "see": ["observe", "witness", "perceive", "note"],
+    "know": ["understand", "comprehend", "recognize", "grasp"],
+    "likes": ["prefers", "appreciates", "enjoys", "favors"],
+    "likes": ["prefers", "appreciates", "enjoys", "favors"],
+    "tries": ["attempts", "seeks to", "endeavors to", "makes an effort to"],
+    "try": ["attempt", "seek to", "endeavor to", "make an effort to"],
+    "happens": ["occurs", "takes place", "transpires", "arises"],
+    "happen": ["occur", "take place", "transpire", "arise"],
+    "looks": ["appears", "seems", "gives the impression"],
+    "look": ["appear", "seem", "give the impression"],
+    "includes": ["encompasses", "comprises", "incorporates", "contains"],
+    "include": ["encompass", "comprise", "incorporate", "contain"],
+    "changes": ["alters", "modifies", "transforms", "shifts"],
+    "change": ["alter", "modify", "transform", "shift"],
+    "starts": ["begins", "initiates", "commences", "kicks off"],
+    "start": ["begin", "initiate", "commence", "kick off"],
+    "allows": ["permits", "enables", "facilitates", "grants"],
+    "allow": ["permit", "enable", "facilitate", "grant"],
+    "shows": ["demonstrates", "exhibits", "reveals", "illustrates"],
+    "keeps": ["maintains", "preserves", "retains", "sustains"],
+    "keep": ["maintain", "preserve", "retain", "sustain"],
+    "brings": ["delivers", "carries", "conveys", "transports"],
+    "bring": ["deliver", "carry", "convey", "transport"],
+    "works": ["functions", "operates", "performs", "acts"],
+    "work": ["function", "operate", "perform", "act"],
+    "writes": ["authors", "composes", "creates", "pens"],
+    "write": ["author", "compose", "create", "pen"],
+    "leads": ["guides", "directs", "steers", "manages"],
+    "lead": ["guide", "direct", "steer", "manage"],
+    "feels": ["senses", "perceives", "experiences", "registers"],
+    "feel": ["sense", "perceive", "experience", "register"],
+    "continues": ["persists", "carries on", "proceeds", "sustains"],
+    "continue": ["persist", "carry on", "proceed", "sustain"],
+    "moves": ["advances", "progresses", "shifts", "proceeds"],
+    "move": ["advance", "progress", "shift", "proceed"],
+    "appears": ["emerges", "surfaces", "shows up", "comes to light"],
+    "appear": ["emerge", "surface", "show up", "come to light"],
+    "suggests": ["proposes", "implies", "indicates", "hints at"],
+    "suggest": ["propose", "imply", "indicate", "hint at"],
+    "lacks": ["lacks", "is without", "is devoid of", "is missing"],
+    "lack": ["lack", "is without", "is devoid of", "is missing"],
+    "achieves": ["accomplishes", "attains", "realizes", "secures"],
+    "achieve": ["accomplish", "attain", "realize", "secure"],
 
-# Contractions map
-CONTractions = {
+    # Adjectives
+    "rapid": ["swift", "quick", "fast", "speedy", "accelerating"],
+    "significant": ["notable", "substantial", "considerable", "important", "meaningful"],
+    "major": ["significant", "key", "crucial", "important", "principal"],
+    "important": ["significant", "crucial", "essential", "vital", "key"],
+    "crucial": ["essential", "critical", "vital", "pivotal", "decisive"],
+    "essential": ["fundamental", "basic", "core", "vital", "indispensable"],
+    "remarkable": ["notable", "outstanding", "exceptional", "impressive", "noteworthy"],
+    "impressive": ["striking", "notable", "compelling", "powerful", "remarkable"],
+    "nuanced": ["subtle", "delicate", "refined", "sophisticated", "complex"],
+    "artificial": ["synthetic", "manufactured", "engineered", "fabricated", "constructed"],
+    "modern": ["contemporary", "current", "present-day", "recent", "up-to-date"],
+    "artificial": ["synthetic", "manufactured", "engineered", "man-made"],
+    "challenging": ["difficult", "demanding", "tough", "arduous", "complex"],
+    "challenges": ["difficulties", "obstacles", "hurdles", "barriers", "problems"],
+    "opportunities": ["possibilities", "prospects", "chances", "openings", "avenues"],
+    "capabilities": ["abilities", "competencies", "skills", "strengths", "capacities"],
+    "understanding": ["comprehension", "insight", "knowledge", "awareness", "grasp"],
+    "challenges": ["difficulties", "obstacles", "hurdles", "barriers"],
+    "impressive": ["remarkable", "notable", "striking", "compelling"],
+    "targeted": ["specific", "directed", "aimed", "focused", "precision"],
+    "capable": ["able", "competent", "skilled", "proficient", "equipped"],
+    "specific": ["particular", "defined", "distinct", "precise", "exact"],
+    "artificial": ["synthetic", "engineered", "manufactured", "constructed"],
+    "rapid": ["swift", "quick", "fast", "speedy", "brisk"],
+    "modern": ["contemporary", "current", "present-day", "new-age"],
+    "significant": ["notable", "substantial", "material", "important"],
+    "complex": ["intricate", "complex", "complicated", "sophisticated", "elaborate"],
+    "necessary": ["required", "needed", "essential", "mandatory", "compulsory"],
+    "available": ["accessible", "obtainable", "reachable", "attainable", "usable"],
+    "difficult": ["challenging", "demanding", "arduous", "tough", "hard"],
+    "possible": ["feasible", "achievable", "attainable", "viable", "conceivable"],
+    "simple": ["straightforward", "basic", "elementary", "uncomplicated", "plain"],
+    "various": ["several", "numerous", "diverse", "multiple", "different"],
+    "several": ["various", "numerous", "multiple", "several", "some"],
+    "common": ["prevalent", "widespread", "commonplace", "frequent", "ubiquitous"],
+    "previous": ["prior", "earlier", "former", "preceding", "antecedent"],
+    "following": ["subsequent", "ensuing", "next", "later", "successive"],
+    "additional": ["further", "extra", "supplementary", "added", "more"],
+    "different": ["distinct", "varied", "diverse", "dissimilar", "varied"],
+    "powerful": ["strong", "potent", "mighty", "formidable", "compelling"],
+    "effective": ["efficient", "productive", "successful", "impactful", "potent"],
+    "similar": ["comparable", "analogous", "resembling", "like", "akin"],
+    "obvious": ["evident", "clear", "apparent", "manifest", "palpable"],
+    "primary": ["main", "principal", "chief", "key", "leading"],
+    "secondary": ["minor", "lesser", "subordinate", "supporting", "auxiliary"],
+    "traditional": ["conventional", "classic", "established", "standard", "orthodox"],
+    "certain": ["specific", "particular", "defined", "distinct", "precise"],
+
+    # Adverbs
+    "rapidly": ["swiftly", "quickly", "fast", "speedily", "briskly"],
+    "significantly": ["notably", "substantially", "considerably", "markedly", "greatly"],
+    "particularly": ["especially", "specifically", "particularly", "notably", "distinctively"],
+    "especially": ["particularly", "specifically", "notably", "chiefly", "principally"],
+    "generally": ["typically", "usually", "ordinarily", "commonly", "largely"],
+    "specifically": ["particularly", "especially", "exactly", "precisely", "distinctly"],
+    "recently": ["lately", "of late", "recently", "not long ago", "just now"],
+    "already": ["previously", "already", "by now", "thus far", "hitherto"],
+    "still": ["yet", "continue to", "remain", "persevere", "even now"],
+
+    # Nouns
+    "society": ["the public", "the community", "people at large", "civilization"],
+    "systems": ["frameworks", "structures", "mechanisms", "networks", "setups"],
+    "system": ["framework", "structure", "mechanism", "network", "setup"],
+    "research": ["study", "investigation", "inquiry", "examination", "analysis"],
+    "technology": ["tech", "innovation", "advancement", "progress", "development"],
+    "information": ["data", "facts", "knowledge", "insights", "intel"],
+    "example": ["instance", "case", "illustration", "sample", "specimen"],
+    "problem": ["issue", "challenge", "difficulty", "obstacle", "concern"],
+    "time": ["period", "phase", "era", "juncture", "moment"],
+    "way": ["method", "approach", "manner", "means", "technique"],
+    "world": ["realm", "sphere", "domain", "arena", "sector"],
+    "life": ["existence", "living", "being", "experience", "reality"],
+    "fact": ["reality", "truth", "actuality", "certainty", "verity"],
+    "hand": ["side", "support", "assistance", "help", "aid"],
+    "part": ["element", "component", "aspect", "portion", "segment"],
+    "point": ["notion", "idea", "concept", "argument", "thesis"],
+    "case": ["instance", "example", "scenario", "situation", "circumstance"],
+    "course": ["process", "progression", "sequence", "chain", "path"],
+    "matter": ["subject", "topic", "issue", "concern", "question"],
+    " result": ["outcome", "consequence", "effect", "finding", "product"],
+    "question": ["query", "inquiry", "issue", "matter", "concern"],
+    "government": ["state", "authority", "administration", "ruling body", "public office"],
+    "number": ["quantity", "amount", "count", "figure", "total"],
+    "people": ["individuals", "persons", "folk", "citizens", "population"],
+    "things": ["items", "objects", "aspects", "elements", "factors"],
+    "countries": ["nations", "states", "lands", "territories", "regions"],
+    "development": ["progress", "advancement", "evolution", "growth", "emergence"],
+    "methods": ["approaches", "techniques", "strategies", "ways", "means"],
+    "idea": ["concept", "notion", "thought", "belief", "viewpoint"],
+    "group": ["team", "category", "collective", "body", "cluster"],
+    "problems": ["issues", "challenges", "difficulties", "obstacles", "concerns"],
+    "work": ["labor", "effort", "task", "job", "undertaking"],
+    "data": ["information", "facts", "figures", "statistics", "records"],
+    "type": ["kind", "sort", "category", "variety", "classification"],
+    "research": ["study", "investigation", "analysis", "examination", "inquiry"],
+    "view": ["perspective", "opinion", "stance", "standpoint", "outlook"],
+}
+
+CONTRACTIONS = {
     "don't": "do not", "won't": "will not", "can't": "cannot",
     "i'm": "i am", "you're": "you are", "he's": "he is",
     "she's": "she is", "it's": "it is", "we're": "we are",
@@ -28,221 +191,186 @@ CONTractions = {
     "doesn't": "does not", "didn't": "did not", "let's": "let us",
     "that's": "that is", "what's": "what is", "who's": "who is",
     "here's": "here is", "there's": "there is", "how's": "how is",
-    "we'd": "we would", "i'd": "i would", "you'd": "you would",
-    "they'd": "they would", "he'd": "he would", "she'd": "she would",
-    "it'd": "it would", "we'd": "we had", "i'd": "i had",
-    "you'd": "you had", "they'd": "they had", "he'd": "he had",
 }
 
-EXPANSIONS = {v: k for k, v in CONTractions.items()}
+REVERSE_CONTRACTIONS = {v: k for k, v in CONTRACTIONS.items()}
 
-# Transitions
-TRANSITIONS = [
-    "Additionally, ", "Moreover, ", "Furthermore, ", "In addition, ",
-    "Consequently, ", "As a result, ", "Thus, ", "Hence, ",
-    "Nevertheless, ", "However, ", "On the other hand, ",
-    "In contrast, ", "Meanwhile, ", "Subsequently, ",
-    "Notably, ", "Significantly, ", "Importantly, ",
-    "Specifically, ", "In particular, ", "For instance, ",
-    "For example, ", "Indeed, ", "Certainly, ",
-]
-
-def _get_synonym(word, pos=None):
-    """Get a synonym for word from WordNet, avoiding similar forms."""
-    if not _WN_OK or not word or len(word) < 3:
-        return None
-    try:
-        wn_pos = {'NN': wn.NOUN, 'VB': wn.VERB, 'JJ': wn.ADJ, 'RB': wn.ADV}.get(pos, wn.NOUN)
-        synsets = wn.synsets(word, pos=wn_pos)
-        if not synsets:
-            synsets = wn.synsets(word)
-        if not synsets:
-            return None
-        # Pick a synonym that's different enough
-        for syn in synsets:
-            for lemma in syn.lemmas():
-                if lemma.name().lower() != word.lower() and '_' not in lemma.name():
-                    return lemma.name().replace('_', ' ')
-        return None
-    except Exception:
-        return None
-
-def _get_best_pos(word):
-    """Simple heuristic POS tagging."""
-    common_verbs = {'is','are','was','were','have','has','had','do','does','did','will','would','can','could','should','may','might','must'}
-    common_adj = {'rapid','significant','major','important','crucial','essential','remarkable','impressive','nuanced','artificial','modern','recent'}
-    word_lower = word.lower()
-    if word_lower in common_verbs: return 'VB'
-    if word_lower in common_adj: return 'JJ'
-    return 'NN'
+def _get_synonym(word):
+    """Get a synonym from the built-in dictionary."""
+    wl = word.lower()
+    if wl in SYNONYMS:
+        synonyms = SYNONYMS[wl]
+        # Avoid picking the same word
+        candidates = [s for s in synonyms if s.lower() != wl]
+        if candidates:
+            return random.choice(candidates)
+    return None
 
 def _synonym_replace(text, ratio=0.3):
     """Replace ~ratio of words with synonyms, preserving punctuation and structure."""
-    # Use regex to find all word+punctuation tokens
-    tokens = re.findall(r"(\w+(?:'\w+)?)", text)
-    blob = TextBlob(text)
-    tags = blob.tags
-    tag_dict = {w.lower(): t for w, t in tags}
-
-    result_parts = []
-    pos = 0
+    result = []
     i = 0
     while i < len(text):
         m = re.match(r"(\w+(?:'\w+)?)", text[i:])
         if m:
             word = m.group(1)
-            rest = text[i + len(word):]
-            # Check if we should replace
-            pos_tag = tag_dict.get(word.lower(), _get_best_pos(word))
-            if random.random() < ratio and len(word) > 3 and word.isalpha():
-                syn = _get_synonym(word.lower(), pos_tag)
-                if syn and syn.lower() != word.lower():
+            end = i + len(word)
+            punct = text[end:end+1] if end < len(text) else ''
+
+            safe_words = {
+                'the','a','an','of','in','to','for','with','on','at','by','from',
+                'as','is','are','was','were','be','been','being',
+                'and','or','but','if','then','so','than','that','this','these',
+                'those','it','its','they','their','them','we','our','us','i','my',
+                'you','your','he','she','him','her','his','who','which','what',
+                'when','where','why','how','all','each','every','both','few',
+                'more','most','some','any','no','not','only','own','same','such',
+                'can','will','would','could','should','may','might','must','shall'
+            }
+            wl = word.lower()
+            should_replace = (
+                wl not in safe_words and
+                len(word) > 2 and
+                word.isalpha() and
+                random.random() < ratio
+            )
+            if should_replace:
+                syn = _get_synonym(word)
+                if syn:
                     if word[0].isupper():
                         syn = syn.capitalize()
-                    result_parts.append(syn)
+                    result.append(syn)
                 else:
-                    result_parts.append(word)
+                    result.append(word)
             else:
-                result_parts.append(word)
-            # Append non-word characters (punctuation, spaces) as-is
-            j = i + len(word)
-            while j < len(text) and not re.match(r"\w", text[j]):
-                result_parts.append(text[j])
-                j += 1
-            i = j
+                result.append(word)
+
+            # Append the following character (punctuation or space) as-is
+            if punct:
+                result.append(punct)
+                i = end + 1
+            else:
+                i = end
         else:
-            result_parts.append(text[i])
+            result.append(text[i])
             i += 1
 
-    result = ''.join(result_parts).strip()
-    # Restore trailing punctuation from original
-    if text and text[-1] in '.!?' and result and result[-1] not in '.!?':
-        result += text[-1]
-    return result
+    return ''.join(result)
 
 def _shuffle_sentences(text):
-    """Shuffle sentences in a paragraph-like block."""
-    # Split into sentences while keeping the delimiter
-    parts = re.split(r'([.!?]\s+)', text)
+    """Shuffle sentences while keeping the first."""
+    # Split preserving sentence-ending punctuation
+    parts = re.split(r'([.!?]+\s+)', text)
     sentences = []
     for i in range(0, len(parts)-1, 2):
-        sentences.append(parts[i] + parts[i+1])
+        sent = (parts[i] + parts[i+1]).strip()
+        if sent:
+            sentences.append(sent)
     if len(parts) % 2 == 1 and parts[-1].strip():
-        sentences.append(parts[-1])
+        sentences.append(parts[-1].strip())
     if len(sentences) <= 1:
         return text
-    # Keep first sentence, shuffle the rest
     first = sentences[0]
     rest = sentences[1:]
     random.shuffle(rest)
     return first + ' ' + ' '.join(rest)
 
-def _split_long_sentence(sentence, max_len=25):
-    """Split a long sentence on conjunctions."""
-    conjunctions = [' and ', ' but ', ' or ', ', which ', ', that ', ', however ', ', therefore ']
-    parts = [sentence]
-    words = sentence.split()
-    if len(words) > max_len:
-        for conj in conjunctions:
-            if conj in sentence.lower():
-                sub_parts = sentence.lower().split(conj.strip())
-                if len(sub_parts) > 1:
-                    result = sub_parts[0].strip().capitalize()
-                    for i, part in enumerate(sub_parts[1:]):
-                        result += '. ' + part.strip().capitalize() + '.'
-                    return result
-    return sentence
-
-def _swap_pronouns(text):
-    """Basic pronoun normalization."""
-    text = re.sub(r'\bI\b', 'this writer', text)
-    text = re.sub(r'\bmy\b', 'this writer\'s', text)
-    text = re.sub(r'\bwe\b', 'they', text)
-    text = re.sub(r'\bour\b', 'their', text)
-    return text
-
-def _expand_contract(text):
-    """Expand contractions."""
-    for k, v in CONTractions.items():
+def _expand_contractions(text):
+    """Expand contractions to formal form."""
+    for k, v in CONTRACTIONS.items():
         text = re.sub(r'\b' + re.escape(k) + r'\b', v, text, flags=re.IGNORECASE)
     return text
 
-def _add_filler(text):
-    """Add natural filler words."""
-    fillers = ['really ', 'quite ', 'rather ', 'somewhat ', 'fairly ', 'pretty ']
-    words = text.split()
-    if len(words) < 10:
-        return text
-    # Add filler before an adjective
-    adj_pattern = re.compile(r'\b(rapid|significant|major|important|crucial|essential)\b', re.IGNORECASE)
-    def add_filler(m):
-        return m.group(0) + ' ' + random.choice(fillers)
-    return adj_pattern.sub(add_filler, text)
+def _add_contrapositions(text):
+    """Add light contrapositions or qualifier insertions."""
+    qualifiers = [
+        "in many cases, ", "in certain respects, ", "to a considerable extent, ",
+        "from one perspective, ", "accordingly, ", "in practical terms, ",
+        "from a broader viewpoint, ", "ultimately, "
+    ]
+    # Insert qualifier after first period
+    m = re.search(r'([.!?]\s+)', text)
+    if m and len(text) > 50:
+        insert_at = m.start() + len(m.group())
+        q = random.choice(qualifiers)
+        text = text[:insert_at] + ' ' + q + text[insert_at:].lower().capitalize()
+    return text
+
+def _split_long_sentences(text, max_len=35):
+    """Split very long sentences."""
+    sentences = re.split(r'(?<=[.!?])\s+', text)
+    result = []
+    for s in sentences:
+        words = s.split()
+        if len(words) > max_len:
+            # Try to split at conjunctions
+            conj_m = re.search(r'\b(and|but|which|that|however|therefore|thus|hence)\b', s[len(words[0])+1:])
+            if conj_m:
+                split_pos = len(words[0]) + 1 + conj_m.start() + 1
+                first = s[:split_pos].strip()
+                second = s[split_pos:].strip()
+                if first and second:
+                    result.append(first.capitalize() + '. ' + second[0].upper() + second[1:])
+                    continue
+        result.append(s)
+    return ' '.join(result)
 
 def paraphrase(text, level='medium'):
     """
-    Paraphrase text at different levels.
-    level: 'light' (15% word swap), 'medium' (30% word swap + sentence shuffle), 'strong' (50% + all transforms)
-    Returns: paraphrased string
+    Paraphrase text at different intensity levels.
+    light: 20% word swap
+    medium: 35% word swap + sentence shuffle
+    strong: 50% word swap + contractions + contrapositions + long sentence split
     """
     if not text or len(text.strip()) < 20:
         return text
 
-    random.seed()  # Fresh randomness each time
-    text = text.strip()
-    original = text
+    random.seed()
+    original = text.strip()
 
-    # Ensure period at end
+    # Normalize whitespace
+    text = re.sub(r'\s+', ' ', text).strip()
+    if not text:
+        return original
+
     if not re.search(r'[.!?]$', text):
         text += '.'
 
     if level == 'light':
-        text = _expand_contract(text)
-        text = _synonym_replace(text, ratio=0.15)
-        text = text[0].upper() + text[1:] if len(text) > 1 else text
+        text = _expand_contractions(text)
+        text = _synonym_replace(text, ratio=0.20)
 
     elif level == 'medium':
-        text = _expand_contract(text)
-        text = _synonym_replace(text, ratio=0.30)
-        # Sentence shuffle
+        text = _expand_contractions(text)
+        text = _synonym_replace(text, ratio=0.35)
         text = _shuffle_sentences(text)
-        text = text[0].upper() + text[1:] if len(text) > 1 else text
 
     elif level == 'strong':
-        text = _expand_contract(text)
-        text = _add_filler(text)
+        text = _expand_contractions(text)
+        text = _add_contrapositions(text)
         text = _synonym_replace(text, ratio=0.50)
-        # Swap pronouns
-        text = _swap_pronouns(text)
-        # Split long sentences
-        sentences = re.split(r'(?<=[.!?])\s+', text)
-        new_sentences = [_split_long_sentence(s) for s in sentences]
-        text = ' '.join(new_sentences)
-        # Sentence shuffle
-        if len(new_sentences) > 2:
-            first = new_sentences[0]
-            rest = new_sentences[1:]
-            random.shuffle(rest)
-            text = first + ' ' + ' '.join(rest)
-        text = text[0].upper() + text[1:] if len(text) > 1 else text
+        text = _split_long_sentences(text)
+        text = _shuffle_sentences(text)
 
-    # Ensure proper spacing after periods
-    text = re.sub(r'\s+', ' ', text)
-    text = re.sub(r'\.\s+([A-Z])', r'. \1', text)
+    # Fix capitalization
+    text = text[0].upper() + text[1:] if len(text) > 1 else text
+    text = re.sub(r'\s+([.!?])', r'\1', text)  # no space before punctuation
+    text = re.sub(r'([.!?])\s+([a-z])', lambda m: m.group(1) + ' ' + m.group(2).upper(), text)
+    text = re.sub(r'\s+', ' ', text).strip()
 
-    # Avoid identical to original
-    if text.strip() == original.strip() and level != 'light':
-        return paraphrase(text, 'medium')
+    # Avoid trivial identity
+    if text == original and level != 'light':
+        return paraphrase(original, 'medium')
 
-    return text.strip()
+    return text
 
 def paraphrase_multiple(text, n_variants=3, level='medium'):
-    """Generate n_variants different paraphrases of the text."""
+    """Generate multiple unique paraphrases."""
     variants = []
     seen = set()
-    for _ in range(n_variants * 3):  # max attempts
+    for _ in range(n_variants * 5):
         result = paraphrase(text, level)
-        if result not in seen and result != text:
+        if result and result not in seen and result != text:
             seen.add(result)
             variants.append(result)
             if len(variants) >= n_variants:
