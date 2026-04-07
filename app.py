@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
-HF_API_URL = "https://api-inference.huggingface.co/models/roberta-base-openai-detector"
+HF_API_URL = "https://router.huggingface.co/hf-inference/models/openai-community/roberta-base-openai-detector"
 HF_API_KEY = os.environ.get("HF_API_KEY", "").strip()
 
 LEMONSQUEEZY_URL = os.environ.get("LEMONSQUEEZY_URL", "https://yourusername.lemonsqueezy.com/checkout/buy/YOUR-PRODUCT-ID")
