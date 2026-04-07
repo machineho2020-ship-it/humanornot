@@ -14,28 +14,7 @@ try:
 except ImportError:
     PdfReader = None
 
-# Auto-download NLTK data on startup
-def _setup_nltk():
-    import nltk
-    import os
-    # Use /tmp for writable nltk_data
-    nltk_data_dir = '/tmp/nltk_data'
-    os.makedirs(nltk_data_dir, exist_ok=True)
-    nltk.data.path.insert(0, nltk_data_dir)
-    resources = ['wordnet', 'omw-1.4', 'averaged_perceptron_tagger_eng', 'punkt_tab', 'punkt']
-    for resource in resources:
-        try:
-            nltk.data.find(f'corpora/{resource}')
-        except LookupError:
-            try:
-                nltk.download(resource, download_dir=nltk_data_dir, quiet=True)
-            except Exception:
-                pass
 
-try:
-    _setup_nltk()
-except Exception:
-    pass
 
 try:
     import docx
