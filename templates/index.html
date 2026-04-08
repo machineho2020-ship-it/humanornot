@@ -682,6 +682,7 @@
             scanBtn.disabled = false;
         }
     }
+    window.updateCharCount = updateCharCount;
 
     textarea.addEventListener('input', () => {
         updateCharCount(textarea.value.length);
