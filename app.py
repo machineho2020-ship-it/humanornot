@@ -254,7 +254,7 @@ def detect_file():
 @app.route("/paraphrase", methods=["POST"])
 def paraphrase():
     """Paraphrase text to sound more naturally human-written."""
-    data = request.json or {})
+    data = request.json or {}
     text = data.get("text", "").strip()
     level = data.get("level", "medium")  # light, medium, strong
 
