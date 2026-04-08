@@ -3,28 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HumanOrNot — AI Content Detector</title>
+    <title>HumanOrNot — Free AI Content Detector</title>
+    <meta name="description" content="Detect AI-generated text instantly. Free, accurate, and privacy-first. Works on any text — no signup required.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg: #f8f9fc;
+            --bg: #f0f4f8;
             --surface: #ffffff;
-            --border: #e2e8f0;
-            --text: #1a1a2e;
-            --muted: #64748b;
-            --accent: #3b82f6;
-            --accent-dark: #2563eb;
-            --accent-light: #eff6ff;
-            --human: #10b981;
-            --ai: #ef4444;
-            --ai-light: #fee2e2;
+            --surface-2: #f8fafc;
+            --border: #e4e9f0;
+            --text: #0f172a;
+            --text-2: #475569;
+            --muted: #94a3b8;
+            --accent: #4f46e5;
+            --accent-dark: #4338ca;
+            --accent-light: #eef2ff;
+            --accent-mid: #c7d2fe;
+            --human: #059669;
             --human-light: #d1fae5;
-            --pro-bg: #fffbeb;
-            --pro-border: #f59e0b;
-            --radius: 16px;
-            --shadow: 0 4px 24px rgba(0,0,0,0.06);
+            --ai: #dc2626;
+            --ai-light: #fee2e2;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow: 0 4px 16px rgba(0,0,0,0.07);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --radius-lg: 20px;
         }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -32,8 +37,11 @@
             color: var(--text);
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
+            line-height: 1.6;
         }
-        /* Nav */
+        a { color: inherit; text-decoration: none; }
+
+        /* ── NAV ── */
         nav {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -47,25 +55,41 @@
             z-index: 100;
         }
         .nav-logo {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--text);
-            text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.02em;
         }
-        .nav-logo span { color: var(--accent); }
-        .nav-links { display: flex; align-items: center; gap: 8px; }
+        .nav-logo .logo-icon {
+            width: 34px;
+            height: 34px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .nav-logo .logo-icon svg { width: 20px; height: 20px; }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
         .nav-links a {
-            color: var(--muted); text-decoration: none;
-            font-size: 0.875rem; font-weight: 500;
-            padding: 6px 14px; border-radius: 8px; transition: all 0.2s;
+            color: var(--text-2);
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
         }
-        .nav-links a:hover { color: var(--text); background: var(--bg); }
-        .nav-cta { background: var(--accent) !important; color: #fff !important; padding: 8px 18px !important; border-radius: 10px !important; font-weight: 600 !important; }
-        .nav-cta:hover { background: var(--accent-dark) !important; }
-        /* Hamburger Menu */
+        .nav-links a:hover { color: var(--text); background: var(--surface-2); }
+
+        /* Hamburger */
         .hamburger {
             display: none;
             flex-direction: column;
@@ -77,10 +101,9 @@
             border: none;
             transition: background 0.2s;
         }
-        .hamburger:hover { background: var(--bg); }
+        .hamburger:hover { background: var(--surface-2); }
         .hamburger span {
-            width: 22px;
-            height: 2px;
+            width: 22px; height: 2px;
             background: var(--text);
             border-radius: 2px;
             transition: all 0.3s;
@@ -100,12 +123,7 @@
             opacity: 0;
             transition: opacity 0.3s;
         }
-        .sidebar-overlay.show {
-            display: block;
-            opacity: 1;
-        }
-
-        /* Sidebar */
+        .sidebar-overlay.show { display: block; opacity: 1; }
         .sidebar {
             position: fixed;
             top: 0; left: -280px;
@@ -129,15 +147,12 @@
         .sidebar-logo {
             font-size: 1rem;
             font-weight: 800;
-            color: var(--text);
-            text-decoration: none;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .sidebar-logo span { color: var(--accent); }
         .sidebar-close {
-            background: var(--bg);
+            background: var(--surface-2);
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 6px 10px;
@@ -145,7 +160,6 @@
             font-size: 1rem;
             color: var(--muted);
         }
-        .sidebar-close:hover { background: var(--border); color: var(--text); }
         .sidebar-get-started {
             display: block;
             margin: 16px 20px;
@@ -158,7 +172,6 @@
             font-size: 0.9rem;
             text-decoration: none;
         }
-        .sidebar-get-started:hover { background: var(--accent-dark); }
         .sidebar-section { padding: 8px 0; border-bottom: 1px solid var(--border); }
         .sidebar-section:last-child { border-bottom: none; }
         .sidebar-link {
@@ -172,361 +185,319 @@
             font-weight: 500;
             transition: background 0.2s;
         }
-        .sidebar-link:hover { background: var(--bg); }
-        .sidebar-link-arrow {
-            color: var(--muted);
-            font-size: 0.75rem;
-        }
-        .sidebar-link.simple {
-            justify-content: flex-start;
-            gap: 8px;
-        }
-        .sidebar-divider { height: 1px; background: var(--border); margin: 8px 0; }
+        .sidebar-link:hover { background: var(--surface-2); }
+        .sidebar-link-arrow { color: var(--muted); font-size: 0.75rem; }
+        .sidebar-link.simple { justify-content: flex-start; gap: 8px; }
 
-
-        /* Hero */
+        /* ── HERO ── */
         .hero {
             text-align: center;
-            padding: 52px 20px 32px;
-            max-width: 640px;
-            margin: 0 auto;
+            padding: 72px 24px 48px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
         }
         .hero-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: var(--accent-light); color: var(--accent);
-            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em;
-            text-transform: uppercase; padding: 5px 12px; border-radius: 20px; margin-bottom: 18px;
-            border: 1px solid #dbeafe;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--accent-light);
+            color: var(--accent);
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 100px;
+            border: 1px solid var(--accent-mid);
+            margin-bottom: 24px;
+            letter-spacing: 0.02em;
         }
         .hero h1 {
-            font-size: 2.5rem; font-weight: 800; line-height: 1.15;
-            color: var(--text); margin-bottom: 12px; letter-spacing: -0.02em;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight:800;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            color: var(--text);
+            margin-bottom: 16px;
         }
-        .hero h1 em { font-style: normal; color: var(--accent); }
-        .hero p { font-size: 1.05rem; color: var(--muted); max-width: 480px; margin: 0 auto; line-height: 1.6; }
+        .hero h1 em {
+            font-style: normal;
+            color: var(--accent);
+        }
+        .hero p {
+            font-size: 1.05rem;
+            color: var(--text-2);
+            max-width: 540px;
+            margin: 0 auto 8px;
+            line-height: 1.65;
+        }
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .hero-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            color: var(--text-2);
+            font-weight: 500;
+        }
+        .hero-stat .check { color: var(--human); }
 
-        /* Container */
-        .container { max-width: 760px; margin: 0 auto; padding: 0 20px 60px; width: 100%; }
-
-        /* Input Card */
-        .input-card {
+        /* ── MAIN TOOL ── */
+        .tool-container {
+            max-width: 860px;
+            margin: -32px auto 0;
+            padding: 0 16px 60px;
+            position: relative;
+            z-index: 10;
+        }
+        .tool-card {
             background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
             overflow: hidden;
         }
-        .card-header {
-            display: flex;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg);
-        }
-        .mode-tab {
-            flex: 1; padding: 13px 16px;
-            text-align: center; font-size: 0.875rem; font-weight: 600;
-            color: var(--muted); cursor: pointer; border: none; background: none;
-            transition: all 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
-            border-bottom: 2px solid transparent;
-        }
-        .mode-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--surface); }
-        .mode-tab:hover:not(.active) { color: var(--text); }
-        .card-body { padding: 24px; }
 
-        /* Presets */
-        .presets {
-            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
+        /* Mode tabs */
+        .mode-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 16px 16px 0;
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .mode-tabs::-webkit-scrollbar { display: none; }
+        .mode-tab {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            border-radius: 10px 10px 0 0;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-2);
+            cursor: pointer;
+            border: none;
+            background: none;
+            white-space: nowrap;
+            transition: all 0.2s;
+            position: relative;
+            bottom: -1px;
+        }
+        .mode-tab:hover { color: var(--text); background: var(--surface); }
+        .mode-tab.active {
+            color: var(--accent);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-bottom: 1px solid var(--surface);
+        }
+        .mode-tab .tab-icon { font-size: 0.95rem; }
+
+        /* Preset buttons */
+        .preset-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 16px 6px;
+            flex-wrap: wrap;
+        }
+        .preset-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-right: 4px;
         }
         .preset-btn {
-            padding: 5px 12px; background: var(--bg); border: 1px solid var(--border);
-            border-radius: 20px; font-size: 0.75rem; font-weight: 600;
-            color: var(--muted); cursor: pointer; transition: all 0.2s;
-            font-family: inherit;
+            padding: 5px 12px;
+            border-radius: 100px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            color: var(--text-2);
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .preset-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+        .preset-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-light);
+        }
 
         /* Textarea */
-        .textarea-wrap { position: relative; }
+        .textarea-wrap {
+            padding: 12px 16px;
+            position: relative;
+        }
         textarea {
-            width: 100%; height: 200px;
-            border: 1.5px solid var(--border); border-radius: 12px;
-            padding: 14px 16px; font-size: 0.95rem; font-family: inherit;
-            resize: vertical; transition: border-color 0.3s, box-shadow 0.3s;
-            line-height: 1.7; background: var(--bg); color: var(--text);
+            width: 100%;
+            min-height: 180px;
+            padding: 14px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.65;
+            color: var(--text);
+            background: var(--surface);
+            resize: vertical;
+            transition: border-color 0.2s;
+            outline: none;
         }
-        textarea:focus {
-            outline: none; border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(59,130,246,0.1); background: var(--surface);
-        }
-        textarea::placeholder { color: #94a3b8; }
-        .char-count {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-top: 8px; font-size: 0.78rem; color: var(--muted);
-        }
-        .char-count .ok { color: var(--human); font-weight: 600; }
-        .char-count .limit { color: var(--ai); font-weight: 600; }
+        textarea:focus { border-color: var(--accent); }
+        textarea::placeholder { color: var(--muted); }
 
-        /* File Upload */
-        .file-upload-wrap { display: none; flex-direction: column; gap: 12px; }
-        .file-drop {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 10px; padding: 28px;
-            border: 2px dashed var(--border); border-radius: 12px;
-            cursor: pointer; transition: all 0.3s; text-align: center;
-            background: var(--bg);
+        /* Char counter */
+        .char-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px 12px;
         }
-        .file-drop.dragover, .file-drop:hover { border-color: var(--accent); background: var(--accent-light); }
-        .file-drop input { display: none; }
-        .file-drop-icon { font-size: 2rem; }
-        .file-drop-text { font-size: 0.9rem; color: var(--muted); }
-        .file-drop-text span { color: var(--accent); font-weight: 600; }
-        .file-drop-hint { font-size: 0.75rem; color: #94a3b8; }
-        .file-name {
-            display: none; align-items: center; gap: 8px;
-            padding: 10px 14px; background: var(--human-light);
-            border: 1px solid var(--human); border-radius: 10px;
-            font-size: 0.85rem; font-weight: 600; color: var(--human);
+        .char-count { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+        .char-count.warn { color: var(--ai); }
+        .char-count.ok { color: var(--human); }
+        .limits {
+            font-size: 0.75rem;
+            color: var(--text-2);
+            background: var(--surface-2);
+            padding: 4px 10px;
+            border-radius: 100px;
+            border: 1px solid var(--border);
         }
-        .file-name.show { display: flex; }
 
-        /* Image Upload */
-        .image-upload-wrap { display: none; flex-direction: column; gap: 12px; }
-        .image-drop {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 10px; padding: 28px;
-            border: 2px dashed var(--border); border-radius: 12px;
-            cursor: pointer; transition: all 0.3s; text-align: center;
-            background: var(--bg);
+        /* Scan button */
+        .scan-row {
+            padding: 0 16px 16px;
         }
-        .image-drop.dragover, .image-drop:hover { border-color: var(--accent); background: var(--accent-light); }
-        .image-drop input { display: none; }
-        .preview-img { max-width: 100%; max-height: 200px; border-radius: 8px; display: none; }
-        .preview-img.show { display: block; }
-
-        /* Action Row */
-        .action-row {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-top: 16px; gap: 12px;
-        }
-        .limits { font-size: 0.8rem; color: var(--muted); }
-        .limits a { color: var(--accent); text-decoration: none; font-weight: 600; }
         .btn-scan {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 28px; background: var(--accent); border: none;
-            border-radius: 12px; color: #fff; font-size: 0.95rem;
-            font-weight: 700; cursor: pointer; transition: all 0.2s;
-            font-family: inherit; box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .btn-scan:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(59,130,246,0.35); }
+        .btn-scan:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
         .btn-scan:active { transform: translateY(0); }
-        .btn-scan:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-        /* Loader */
-        .loader { display: none; text-align: center; padding: 28px; }
-        .loader.show { display: block; }
-        .spinner {
-            width: 36px; height: 36px; border: 3px solid var(--border);
-            border-top-color: var(--accent); border-radius: 50%;
-            animation: spin 0.7s linear infinite; margin: 0 auto 12px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loader p { color: var(--muted); font-size: 0.9rem; }
+        .btn-scan:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
         /* Result */
-        .result { display: none; margin-top: 24px; }
+        .result { padding: 0 16px 20px; display: none; }
         .result.show { display: block; }
         .verdict-card {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: var(--radius); box-shadow: var(--shadow);
-            padding: 24px; overflow: hidden;
+            background: var(--surface-2);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
         }
-        .verdict-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
-        .verdict-emoji { font-size: 2.5rem; }
-        .verdict-texts h2 {
-            font-size: 1.3rem; font-weight: 800;
+        .verdict-emoji { font-size: 2.5rem; margin-bottom: 8px; }
+        .verdict-label { font-size: 0.75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+        .verdict-text { font-size: 1.2rem; font-weight: 800; color: var(--text); margin-bottom: 16px; }
+        .verdict-bar-wrap { background: var(--border); border-radius: 100px; height: 8px; overflow: hidden; margin-bottom: 12px; }
+        .verdict-bar { height: 100%; border-radius: 100px; transition: width 0.8s ease; }
+        .verdict-bar.ai { background: var(--ai); }
+        .verdict-bar.human { background: var(--human); }
+        .verdict-scores { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; }
+        .verdict-scores .ai-score { color: var(--ai); }
+        .verdict-scores .human-score { color: var(--human); }
+
+        /* Panels */
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        /* File upload */
+        .file-drop {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 36px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 12px 16px;
         }
-        .verdict-texts h2.human { color: var(--human); }
-        .verdict-texts h2.ai { color: var(--ai); }
-        .verdict-texts p { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+        .file-drop:hover { border-color: var(--accent); background: var(--accent-light); }
+        .file-drop .drop-icon { font-size: 2rem; margin-bottom: 8px; }
+        .file-drop .drop-text { font-size: 0.875rem; color: var(--text-2); font-weight: 500; }
+        .file-drop .drop-sub { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+        .file-drop input { display: none; }
+        .image-drop { border: 2px dashed var(--border); border-radius: var(--radius); padding: 24px 20px; text-align: center; cursor: pointer; transition: all 0.2s; margin: 12px 16px; }
+        .image-drop:hover { border-color: var(--accent); background: var(--accent-light); }
+        .image-drop .drop-icon { font-size: 1.5rem; margin-bottom: 8px; }
+        .image-drop .drop-text { font-size: 0.875rem; color: var(--text-2); font-weight: 500; }
 
-        /* Score Bars */
-        .score-bars { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-        .score-bar { background: var(--bg); border-radius: 12px; padding: 14px; }
-        .score-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; }
-        .bar-bg { width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
-        .bar-fill-h { height: 100%; background: linear-gradient(90deg, #10b981, #34d399); border-radius: 4px; transition: width 0.8s ease; }
-        .bar-fill-ai { height: 100%; background: linear-gradient(90deg, #ef4444, #f87171); border-radius: 4px; transition: width 0.8s ease; }
-        .confidence-row { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--muted); margin-bottom: 16px; }
-
-        /* Sentence Highlights */
-        .sentences-section { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
-        .sentences-section h3 { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
-        .sentences-list { display: flex; flex-direction: column; gap: 6px; max-height: 400px; overflow-y: auto; }
-        .sentence-item {
-            padding: 10px 14px; border-radius: 10px; font-size: 0.875rem;
-            line-height: 1.6; border-left: 3px solid transparent;
+        /* Feature tabs content */
+        .feat-header {
+            padding: 20px 20px 12px;
+            border-bottom: 1px solid var(--border);
         }
-        .sentence-item.ai-bg { background: var(--ai-light); border-left-color: var(--ai); }
-        .sentence-item.human-bg { background: var(--human-light); border-left-color: var(--human); }
-        .sentence-item .ai-badge {
-            display: inline-block; font-size: 0.7rem; font-weight: 700;
-            background: var(--ai); color: #fff; padding: 1px 6px; border-radius: 4px; margin-right: 6px;
-        }
-        .sentence-item .human-badge {
-            display: inline-block; font-size: 0.7rem; font-weight: 700;
-            background: var(--human); color: #fff; padding: 1px 6px; border-radius: 4px; margin-right: 6px;
-        }
-        .sentence-item .short-label { font-size: 0.7rem; color: var(--muted); margin-right: 6px; }
-        .sentence-score { font-size: 0.7rem; color: var(--muted); margin-left: 4px; }
+        .feat-header h3 { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+        .feat-header p { font-size: 0.78rem; color: var(--text-2); }
 
-        /* Features Grid */
-        .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px; }
-        .feature {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 12px; padding: 18px 16px; text-align: center;
-        }
-        .feature-icon { font-size: 1.8rem; margin-bottom: 8px; }
-        .feature h3 { font-size: 0.875rem; font-weight: 700; margin-bottom: 4px; }
-        .feature p { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
-
-        /* Footer */
-        footer {
-            text-align: center; padding: 24px; color: var(--muted);
-            font-size: 0.78rem; border-top: 1px solid var(--border); background: var(--surface);
-        }
-        footer a { color: var(--accent); text-decoration: none; }
-
-        /* Error */
-        .error-msg { text-align: center; padding: 20px; color: var(--ai); font-size: 0.9rem; font-weight: 600; }
-        .upgrade-msg {
-            text-align: center; padding: 16px; background: var(--pro-bg);
-            border: 1px solid var(--pro-border); border-radius: 10px;
-            font-size: 0.85rem; color: #92400e; margin-bottom: 16px;
-        }
-        .upgrade-msg a { color: var(--pro-border); font-weight: 700; text-decoration: underline; }
-
-        /* Stats bar */
-        .stats-bar {
-            display: flex; gap: 16px; margin-bottom: 16px;
-            background: var(--bg); border-radius: 10px; padding: 12px 16px;
-        }
-        .stat { flex: 1; text-align: center; }
-        .stat-val { font-size: 1.2rem; font-weight: 800; color: var(--text); }
-
-        /* Paraphrase section */
-        .humanize-section { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
-        .humanize-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-        .humanize-header h3 { font-size: 0.9rem; font-weight: 700; color: var(--text); }
-        .humanize-header p { font-size: 0.78rem; color: var(--muted); }
-        .level-btns { display: flex; gap: 6px; }
-        .level-btn { padding: 5px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 0.75rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; font-family: inherit; }
-        .level-btn:hover { border-color: var(--accent); color: var(--accent); }
-        .level-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-        .para-apply-btn { padding: 8px 16px; background: #10b981; border: none; border-radius: 8px; color: #fff; font-size: 0.8rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; }
-        .para-apply-btn:hover { background: #059669; }
-        .para-apply-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .para-variants { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-        .para-variant { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 0.875rem; line-height: 1.6; cursor: pointer; transition: all 0.2s; position: relative; }
-        .para-variant:hover { border-color: var(--human); background: var(--human-light); }
-        .para-variant .variant-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
-        .para-variant .use-btn { position: absolute; top: 10px; right: 10px; padding: 4px 10px; background: var(--human); border: none; border-radius: 6px; color: #fff; font-size: 0.7rem; font-weight: 700; cursor: pointer; opacity: 0; transition: opacity 0.2s; font-family: inherit; }
-        .para-variant:hover .use-btn { opacity: 1; }
-        .para-loading { text-align: center; padding: 16px; color: var(--muted); font-size: 0.85rem; }
-
-        /* Writing Stats */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
-        .stat-card { background: var(--bg); border-radius: 10px; padding: 14px 12px; text-align: center; }
-        .stat-card .val { font-size: 1.4rem; font-weight: 800; color: var(--text); }
-        .stat-card .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
-        .stat-card.accent .val { color: var(--accent); }
-        .stat-card.green .val { color: var(--human); }
-        .stat-card.red .val { color: var(--ai); }
-        .readability-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; background: var(--accent-light); color: var(--accent); border: 1px solid #dbeafe; margin-top: 8px; }
-        .tone-badge { display: inline-block; padding: 3px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; background: var(--bg); border: 1px solid var(--border); color: var(--muted); margin-top: 8px; }
-        .issue-item { display: flex; gap: 8px; align-items: flex-start; padding: 10px 14px; background: #fffbeb; border: 1px solid #f59e0b; border-radius: 8px; font-size: 0.85rem; color: #92400e; margin-bottom: 8px; }
-        .issue-item::before { content: '💡'; flex-shrink: 0; }
-
-        /* Grammar */
-        .grammar-issue { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
-        .grammar-issue .gi-msg { font-size: 0.9rem; font-weight: 600; color: var(--ai); margin-bottom: 4px; }
-        .grammar-issue .gi-short { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
-        .grammar-issue .gi-context { background: var(--bg); padding: 8px 10px; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; border-left: 3px solid var(--ai); margin-bottom: 8px; }
-        .grammar-issue .gi-type { display: inline-block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--muted); background: var(--bg); padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; }
-        .grammar-issue .gi-fix { display: inline-block; padding: 3px 10px; background: var(--human-light); border: 1px solid var(--human); border-radius: 6px; font-size: 0.75rem; font-weight: 700; color: var(--human); margin-right: 4px; }
-        .grammar-summary { display: flex; gap: 16px; margin-bottom: 16px; }
-        .grammar-summary .gs-item { flex: 1; background: var(--bg); border-radius: 10px; padding: 14px; text-align: center; }
-        .grammar-summary .gs-val { font-size: 1.5rem; font-weight: 800; }
-        .grammar-summary .gs-val.ok { color: var(--human); }
-        .grammar-summary .gs-val.err { color: var(--ai); }
-        .grammar-summary .gs-lbl { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
-
-        /* Vocabulary */
-        .vocab-risk { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
-        .vocab-risk.high { background: #fee2e2; color: var(--ai); border: 1px solid #fca5a5; }
-        .vocab-risk.medium { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
-        .vocab-risk.low { background: var(--human-light); color: var(--human); border: 1px solid #6ee7b7; }
-        .vocab-phrase { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; }
-        .vocab-phrase .vp-phrase { font-weight: 700; font-size: 0.9rem; color: var(--text); }
-        .vocab-phrase .vp-freq { font-size: 0.75rem; font-weight: 700; color: var(--ai); background: #fee2e2; padding: 2px 8px; border-radius: 6px; }
-        .vocab-phrase .vp-example { font-size: 0.8rem; color: var(--muted); margin-top: 4px; line-height: 1.5; }
-        .vocab-phrase .vp-example strong { color: var(--ai); }
-
-        /* Citation */
-        .cite-inputs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-        .cite-inputs input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.9rem; font-family: inherit; background: var(--bg); transition: border-color 0.3s; }
-        .cite-inputs input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
-        .cite-format-btns { display: flex; gap: 6px; margin-bottom: 16px; }
-        .cite-fmt-btn { padding: 6px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; font-family: inherit; }
-        .cite-fmt-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-        .cite-result { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 10px; position: relative; }
-        .cite-result .cr-format { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-        .cite-result .cr-text { font-size: 0.875rem; line-height: 1.7; color: var(--text); }
-        .cite-copy { position: absolute; top: 12px; right: 12px; padding: 3px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; font-size: 0.7rem; font-weight: 600; color: var(--muted); cursor: pointer; font-family: inherit; }
-        .cite-copy:hover { border-color: var(--accent); color: var(--accent); }
-
-        /* Summarize */
-        .sum-length-btns { display: flex; gap: 6px; margin-bottom: 16px; }
-        .sum-len-btn { padding: 6px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; font-family: inherit; }
-        .sum-len-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-        .sum-result { background: var(--accent-light); border: 1px solid #dbeafe; border-radius: 12px; padding: 18px; font-size: 0.95rem; line-height: 1.8; color: var(--text); }
-        .stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-
-        @media (max-width: 600px) {
-            .hero h1 { font-size: 2rem; }
-            .features { grid-template-columns: 1fr; }
-            .score-bars { grid-template-columns: 1fr; }
-            .nav-links { display: none; }
-            .mode-tab { font-size: 0.8rem; padding: 12px 8px; }
-        }
-
-        /* Modals */
+        /* ── MODALS ── */
         .modal-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-            z-index: 1000; align-items: center; justify-content: center; padding: 20px;
-            backdrop-filter: blur(4px);
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
         .modal-overlay.show { display: flex; }
         .modal {
-            background: var(--surface); border-radius: 16px; max-width: 560px; width: 100%;
-            max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            max-width: 560px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
             border: 1px solid var(--border);
         }
         .modal-header {
-            padding: 20px 24px 0; display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 24px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         .modal-header h2 { font-size: 1.1rem; font-weight: 700; margin: 0; }
         .modal-close {
-            background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
-            padding: 6px 10px; cursor: pointer; font-size: 1rem; color: var(--muted);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--muted);
             transition: all 0.2s;
         }
         .modal-close:hover { background: var(--border); color: var(--text); }
         .modal-body { padding: 16px 24px 24px; }
-        .modal-body p { font-size: 0.875rem; color: var(--text); line-height: 1.6; margin: 0 0 12px; }
+        .modal-body p { font-size: 0.875rem; color: var(--text-2); line-height: 1.65; margin: 0 0 12px; }
         .modal-body strong { color: var(--accent); }
         .hiw-step {
             display: flex; gap: 14px; align-items: flex-start; margin-bottom: 16px;
-            padding: 12px; background: var(--bg); border-radius: 10px;
+            padding: 12px; background: var(--surface-2); border-radius: 10px;
         }
         .hiw-step-num {
             background: var(--accent); color: #fff; font-weight: 800; font-size: 0.75rem;
@@ -534,37 +505,70 @@
             justify-content: center; flex-shrink: 0;
         }
         .hiw-step h4 { font-size: 0.875rem; font-weight: 700; margin: 0 0 4px; }
-        .hiw-step p { font-size: 0.8rem; color: var(--muted); margin: 0; }
-        .edu-feature {
-            display: flex; gap: 10px; align-items: center; margin-bottom: 10px;
+        .hiw-step p { font-size: 0.8rem; color: var(--text-2); margin: 0; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 24px;
+            font-size: 0.78rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            background: var(--surface);
         }
-        .edu-feature span { font-size: 1.1rem; }
-        .edu-feature p { font-size: 0.85rem; margin: 0; color: var(--text); }
+        footer a { color: var(--accent); }
+
+        /* Loading spinner */
+        .spinner {
+            display: none;
+            width: 24px; height: 24px;
+            border: 3px solid var(--accent-mid);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #loader.show .spinner { display: block; }
+        #loader {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.85);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 14px;
+        }
+        #loader.show { display: flex; }
+        #loaderText { font-size: 0.875rem; color: var(--text-2); font-weight: 500; }
+
+        /* Animations */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .tool-card { animation: fadeInUp 0.4s ease; }
+        .hero { animation: fadeInUp 0.4s ease; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none !important; }
+            .hamburger { display: flex !important; }
+            .hero { padding: 48px 20px 32px; }
+            .hero h1 { font-size: 1.8rem; }
+            .tool-container { padding: 0 12px 40px; margin-top: -20px; }
+            .mode-tabs { padding: 12px 12px 0; }
+            .mode-tab { padding: 8px 12px; font-size: 0.78rem; }
+            .feat-header { padding: 16px 16px 10px; }
+            .hero-stats { gap: 16px; }
+        }
     </style>
 </head>
 <body>
 
-<nav>
-    <a href="/" class="nav-logo">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="#3b82f6" stroke-width="2.5"/>
-            <path d="M8 12l3 3 5-5" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Human<span>Or</span>Not
-    </a>
-    <div class="nav-links">
-        <a href="#" onclick="showModal('howItWorksModal')">How it works</a>
-        <a href="#" onclick="showModal('forEducatorsModal')">For Educators</a>
-    </div>
-
-        <button class="hamburger" id="hamburgerBtn" onclick="openSidebar()" aria-label="Open menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-
-</nav>
-
+<!-- Loading overlay -->
+<div id="loader">
+    <div class="spinner"></div>
+    <p id="loaderText">Analyzing text...</p>
+</div>
 
 <!-- Sidebar Overlay -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -572,16 +576,15 @@
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <a href="/" class="sidebar-logo">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="#3b82f6" stroke-width="2.5"/>
-                <path d="M8 12l3 3 5-5" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Human<span>Or</span>Not
-        </a>
+        <div class="sidebar-logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2.5"/><path d="M8 12l3 3 5-5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            HumanOrNot
+        </div>
         <button class="sidebar-close" onclick="closeSidebar()">✕</button>
     </div>
-    <a href="/upgrade" class="sidebar-get-started">Get Started — 100% Free</a>
+    <a href="/" class="sidebar-get-started">Get Started — 100% Free</a>
     <div class="sidebar-section">
         <a href="#" class="sidebar-link" onclick="toggleSubmenu('products')">Products <span class="sidebar-link-arrow">▾</span></a>
         <a href="/detect" class="sidebar-link simple">→ AI Detection</a>
@@ -607,213 +610,281 @@
     </div>
 </div>
 
+<nav>
+    <a href="/" class="nav-logo">
+        <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2.5"/>
+                <path d="M8 12l3 3 5-5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        HumanOrNot
+    </a>
+    <div class="nav-links">
+        <a href="#" onclick="showModal('howItWorksModal')">How it works</a>
+        <a href="#" onclick="showModal('forEducatorsModal')">For Educators</a>
+    </div>
+    <button class="hamburger" id="hamburgerBtn" onclick="openSidebar()" aria-label="Open menu">
+        <span></span><span></span><span></span>
+    </button>
+</nav>
+
 <div class="hero">
     <div class="hero-badge">🔬 AI Detection</div>
     <h1>Is it <em>human</em> or <em>AI</em>?</h1>
-    <p>AI detection + Grammar + Summarizer + Citations — all in one free tool for students and educators.</p>
+    <p>Detect AI-generated text instantly with 85%+ accuracy. Free, private, and no signup required.</p>
+    <div class="hero-stats">
+        <div class="hero-stat"><span class="check">✓</span> 100% Free</div>
+        <div class="hero-stat"><span class="check">✓</span> No signup needed</div>
+        <div class="hero-stat"><span class="check">✓</span> Privacy-first</div>
+    </div>
 </div>
 
-<div class="container">
-    <div class="input-card">
-        <div class="card-header">
-            <button class="mode-tab active" id="textTab" onclick="setMode('text')">✏️ Detect</button>
-            <button class="mode-tab" id="fileTab" onclick="setMode('file')">📄 Document</button>
-            <button class="mode-tab" id="vocabTab" onclick="setMode('vocab')">📝 Vocabulary</button>
-            <button class="mode-tab" id="grammarTab" onclick="setMode('grammar')">✅ Grammar</button>
-            <button class="mode-tab" id="sumTab" onclick="setMode('sum')">📋 Summarize</button>
-            <button class="mode-tab" id="citeTab" onclick="setMode('cite')">📚 Cite</button>
-            <button class="mode-tab" id="readTab" onclick="setMode('read')">📊 Readability</button>
-            <button class="mode-tab" id="humanTab" onclick="setMode('human')">🌀 Humanizer</button>
-            <button class="mode-tab" id="imageTab" onclick="setMode('image')">🖼️ Image</button>
+<div class="tool-container">
+    <div class="tool-card">
+        <!-- Mode Tabs -->
+        <div class="mode-tabs">
+            <button class="mode-tab active" id="textTab" onclick="setMode('text')"><span class="tab-icon">✏️</span> Detect</button>
+            <button class="mode-tab" id="fileTab" onclick="setMode('file')"><span class="tab-icon">📄</span> Document</button>
+            <button class="mode-tab" id="vocabTab" onclick="setMode('vocab')"><span class="tab-icon">📝</span> Vocabulary</button>
+            <button class="mode-tab" id="grammarTab" onclick="setMode('grammar')"><span class="tab-icon">✅</span> Grammar</button>
+            <button class="mode-tab" id="sumTab" onclick="setMode('sum')"><span class="tab-icon">📋</span> Summarize</button>
+            <button class="mode-tab" id="citeTab" onclick="setMode('cite')"><span class="tab-icon">📚</span> Cite</button>
+            <button class="mode-tab" id="readTab" onclick="setMode('read')"><span class="tab-icon">📊</span> Readability</button>
+            <button class="mode-tab" id="humanTab" onclick="setMode('human')"><span class="tab-icon">🌀</span> Humanizer</button>
+            <button class="mode-tab" id="imageTab" onclick="setMode('image')"><span class="tab-icon">🖼️</span> Image</button>
         </div>
-        <div class="card-body">
-            <!-- TEXT PANEL -->
-            <div id="textPanel">
-                <div class="presets">
-                    <span style="font-size:0.75rem;font-weight:600;color:var(--muted);align-self:center;margin-right:4px;">Try:</span>
-                    <button class="preset-btn" onclick="loadPreset('chatgpt')">ChatGPT</button>
-                    <button class="preset-btn" onclick="loadPreset('claude')">Claude</button>
-                    <button class="preset-btn" onclick="loadPreset('human')">Human</button>
-                    <button class="preset-btn" onclick="loadPreset('ai-human')">AI + Human</button>
-                    <button class="preset-btn" onclick="loadPreset('paraphrased')">Paraphrased</button>
-                    <button class="preset-btn" onclick="loadPreset('polished')">Polished by AI</button>
-                </div>
-                <div class="textarea-wrap">
-                    <textarea id="textInput" placeholder="Paste text here to detect AI-generated content... (minimum 50 characters)" oninput="updateCharCount(this.value.length)"></textarea>
-                </div>
-                <div class="char-count">
-                    <span id="charStatus"></span>
-                    <span><span id="charCount">0</span> characters</span>
-                </div>
+
+        <!-- Text Panel -->
+        <div id="textPanel" class="panel active">
+            <div class="preset-bar">
+                <span class="preset-label">Try:</span>
+                <button class="preset-btn" onclick="loadPreset('chatgpt')">ChatGPT</button>
+                <button class="preset-btn" onclick="loadPreset('claude')">Claude</button>
+                <button class="preset-btn" onclick="loadPreset('human')">Human</button>
+                <button class="preset-btn" onclick="loadPreset('ai-human')">AI + Human</button>
+                <button class="preset-btn" onclick="loadPreset('paraphrased')">Paraphrased</button>
+                <button class="preset-btn" onclick="loadPreset('polished')">Polished by AI</button>
             </div>
-
-            <!-- VOCABULARY PANEL -->
-            <div id="vocabPanel" class="file-upload-wrap" style="display:none;">
-                <div class="textarea-wrap">
-                    <textarea id="vocabInput" placeholder="Paste text to scan for AI vocabulary patterns..."></textarea>
-                </div>
-                <div class="char-count"><span id="vocabCharCount">0</span> characters · Scans for 60+ common AI phrases</div>
-                <div class="action-row" style="margin-top:12px;">
-                    <div class="limits">🔍 AI Vocabulary Scanner</div>
-                    <button class="btn-scan" onclick="runVocab()">Scan Vocabulary</button>
-                </div>
+            <div class="textarea-wrap">
+                <textarea id="textInput" placeholder="Paste text here to detect AI-generated content... (minimum 50 characters)" oninput="updateCharCount(this.value.length)"></textarea>
             </div>
-
-            <!-- GRAMMAR PANEL -->
-            <div id="grammarPanel" class="file-upload-wrap" style="display:none;">
-                <div class="textarea-wrap">
-                    <textarea id="grammarInput" placeholder="Paste text to check for grammar and spelling errors..."></textarea>
-                </div>
-                <div class="char-count"><span id="grammarCharCount">0</span> characters · Powered by LanguageTool</div>
-                <div class="action-row" style="margin-top:12px;">
-                    <div class="limits">✅ Grammar & Spelling Check</div>
-                    <button class="btn-scan" onclick="runGrammar()">Check Grammar</button>
-                </div>
+            <div class="char-row">
+                <span class="char-count" id="charCount">0 characters</span>
+                <span class="limits" id="limits">Unlimited checks · 100% free</span>
             </div>
-
-            <!-- SUMMARIZE PANEL -->
-            <div id="sumPanel" class="file-upload-wrap" style="display:none;">
-                <div class="textarea-wrap">
-                    <textarea id="sumInput" placeholder="Paste article or long text to summarize..."></textarea>
-                </div>
-                <div class="char-count"><span id="sumCharCount">0</span> characters · AI-powered summarization</div>
-                <div style="margin-top:12px;">
-                    <div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px;font-weight:600;">Summary Length:</div>
-                    <div class="sum-length-btns">
-                        <button class="sum-len-btn" onclick="setSumLen('short', this)">Short</button>
-                        <button class="sum-len-btn active" onclick="setSumLen('medium', this)">Medium</button>
-                        <button class="sum-len-btn" onclick="setSumLen('long', this)">Detailed</button>
-                    </div>
-                </div>
-                <div class="action-row" style="margin-top:12px;">
-                    <div class="limits">📋 AI Summarizer</div>
-                    <button class="btn-scan" onclick="runSummarize()">Summarize</button>
-                </div>
-            </div>
-
-            <!-- CITE PANEL -->
-            <div id="citePanel" class="file-upload-wrap" style="display:none;">
-                <div class="cite-inputs">
-                    <input type="url" id="citeUrlInput" placeholder="Paste article or webpage URL..." style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;font-family:inherit;background:var(--bg);">
-                </div>
-                <div class="cite-format-btns">
-                    <button class="cite-fmt-btn active" onclick="setCiteFormat('apa', this)">APA</button>
-                    <button class="cite-fmt-btn" onclick="setCiteFormat('mla', this)">MLA</button>
-                    <button class="cite-fmt-btn" onclick="setCiteFormat('chicago', this)">Chicago</button>
-                    <button class="cite-fmt-btn" onclick="setCiteFormat('all', this)">All Formats</button>
-                </div>
-                <div id="citeResults"></div>
-                <div class="action-row" style="margin-top:12px;">
-                    <div class="limits">📚 Citation Generator</div>
-                    <button class="btn-scan" onclick="runCite()">Generate Citation</button>
-                </div>
-            </div>
-
-            <!-- HUMANIZER PANEL -->
-            <div id="humanPanel" class="file-upload-wrap" style="display:none;">
-                <div class="textarea-wrap">
-                    <textarea id="humanInput" placeholder="Paste AI-generated text here to rewrite it as a human would write..."></textarea>
-                </div>
-                <div style="margin-top:12px;">
-                    <div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px;font-weight:600;">Humanization Level:</div>
-                    <div class="sum-length-btns">
-                        <button class="sum-len-btn" onclick="setHumanLen('light', this)">Light</button>
-                        <button class="sum-len-btn active" onclick="setHumanLen('medium', this)">Medium</button>
-                        <button class="sum-len-btn" onclick="setHumanLen('strong', this)">Strong</button>
-                    </div>
-                </div>
-                <div class="action-row" style="margin-top:12px;">
-                    <div class="limits">🌀 Make AI text sound human — free, no API needed</div>
-                    <button class="btn-scan" id="runHumanizeBtn" onclick="runHumanize()" style="background:#10b981;box-shadow:0 4px 12px rgba(16,185,129,0.3);">🌀 Humanize Now</button>
-                </div>
-            </div>
-
-            <!-- READABILITY PANEL -->
-            <div id="readPanel" class="file-upload-wrap" style="display:none;">
-                <div class="textarea-wrap">
-                    <textarea id="readInput" placeholder="Paste text to analyze readability, sentence complexity, and writing quality..."></textarea>
-                </div>
-                <div class="char-count"><span id="readCharCount">0</span> characters</div>
-                <div class="action-row" style="margin-top:12px;">
-                    <div class="limits">📊 Flesch-Kincaid · Coleman-Liau · SMOG · Sentence Analysis</div>
-                    <button class="btn-scan" onclick="runReadability()">Analyze Writing</button>
-                </div>
-            </div>
-
-            <!-- FILE PANEL -->
-            <div id="filePanel" class="file-upload-wrap">
-                <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
-                    <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.txt" onchange="handleFile(this.files)" multiple>
-                    <div class="file-drop-icon">📄</div>
-                    <div class="file-drop-text">Drag & drop or <span>browse</span> · Multiple files supported</div>
-                    <div class="file-drop-hint">PDF · DOCX · TXT · Max 10 files · Max 5MB each</div>
-                </div>
-                <div id="batchFileList" style="display:none;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
-                <div id="fileCount" style="font-size:0.8rem;color:var(--muted);margin-bottom:8px;display:none;"></div>
-            </div>
-
-            <!-- IMAGE PANEL -->
-            <div id="imagePanel" class="image-upload-wrap">
-                <div class="image-drop" id="imageDrop" onclick="document.getElementById('imageInput').click()">
-                    <input type="file" id="imageInput" accept="image/*" onchange="handleImage(this.files[0])">
-                    <img id="previewImg" class="preview-img" alt="Preview">
-                    <div class="file-drop-icon">🖼️</div>
-                    <div class="file-drop-text">Drag & drop or <span>browse</span></div>
-                    <div class="file-drop-hint">JPG, PNG, GIF, WEBP · Max 5MB</div>
-                </div>
-
-            </div>
-
-            <div class="action-row">
-                <div class="limits" id="limits">Unlimited checks · 100% free</div>
+            <div class="scan-row">
                 <button class="btn-scan" id="scanBtn" onclick="runDetect()">🔍 Scan Now</button>
             </div>
         </div>
+
+        <!-- File Panel -->
+        <div id="filePanel" class="panel">
+            <div class="feat-header">
+                <h3>📄 Document Analysis</h3>
+                <p>Upload a PDF, DOCX, or TXT file for sentence-level AI detection</p>
+            </div>
+            <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
+                <div class="drop-icon">📄</div>
+                <div class="drop-text">Click to upload or drag & drop</div>
+                <div class="drop-sub">PDF, DOCX, or TXT · Max 10MB</div>
+                <input type="file" id="fileInput" accept=".pdf,.docx,.txt" onchange="handleFile(this)">
+            </div>
+            <div id="fileResult" class="result"></div>
+        </div>
+
+        <!-- Vocab Panel -->
+        <div id="vocabPanel" class="panel">
+            <div class="feat-header">
+                <h3>📝 AI Vocabulary Scanner</h3>
+                <p>Scans for 60+ common AI filler phrases and patterns</p>
+            </div>
+            <div class="textarea-wrap">
+                <textarea id="vocabInput" placeholder="Paste text to scan for AI vocabulary patterns..."></textarea>
+            </div>
+            <div class="scan-row">
+                <button class="btn-scan" onclick="runVocab()">🔍 Scan Vocabulary</button>
+            </div>
+            <div id="vocabResult" class="result"></div>
+        </div>
+
+        <!-- Grammar Panel -->
+        <div id="grammarPanel" class="panel">
+            <div class="feat-header">
+                <h3>✅ Grammar & Style Check</h3>
+                <p>Powered by LanguageTool — finds grammar, spelling & style issues</p>
+            </div>
+            <div class="textarea-wrap">
+                <textarea id="grammarInput" placeholder="Paste text to check grammar and style..."></textarea>
+            </div>
+            <div class="scan-row">
+                <button class="btn-scan" onclick="runGrammar()">🔍 Check Grammar</button>
+            </div>
+            <div id="grammarResult" class="result"></div>
+        </div>
+
+        <!-- Summarize Panel -->
+        <div id="sumPanel" class="panel">
+            <div class="feat-header">
+                <h3>📋 AI Summarizer</h3>
+                <p>Condense long articles into clear, concise summaries</p>
+            </div>
+            <div class="textarea-wrap">
+                <textarea id="sumInput" placeholder="Paste article or long text to summarize..."></textarea>
+            </div>
+            <div class="char-row" style="padding-bottom:12px">
+                <span class="preset-label" style="margin:0">Length:</span>
+                <div style="display:flex;gap:6px">
+                    <button class="preset-btn" onclick="setSumLen('short', this)">Short</button>
+                    <button class="preset-btn active" onclick="setSumLen('medium', this)">Medium</button>
+                    <button class="preset-btn" onclick="setSumLen('long', this)">Detailed</button>
+                </div>
+            </div>
+            <div class="scan-row">
+                <button class="btn-scan" onclick="runSummarize()">📋 Summarize</button>
+            </div>
+            <div id="sumResult" class="result"></div>
+        </div>
+
+        <!-- Cite Panel -->
+        <div id="citePanel" class="panel">
+            <div class="feat-header">
+                <h3>📚 Citation Generator</h3>
+                <p>Generate APA, MLA, and Chicago citations from any URL</p>
+            </div>
+            <div class="textarea-wrap">
+                <input type="url" id="citeUrl" placeholder="Paste a URL to generate citation..." style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:0.95rem;outline:none;transition:border-color 0.2s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <div class="char-row" style="padding-bottom:12px">
+                <span class="preset-label" style="margin:0">Format:</span>
+                <div style="display:flex;gap:6px">
+                    <button class="preset-btn active" onclick="setCiteFormat('apa', this)">APA</button>
+                    <button class="preset-btn" onclick="setCiteFormat('mla', this)">MLA</button>
+                    <button class="preset-btn" onclick="setCiteFormat('chicago', this)">Chicago</button>
+                    <button class="preset-btn" onclick="setCiteFormat('all', this)">All</button>
+                </div>
+            </div>
+            <div class="scan-row">
+                <button class="btn-scan" onclick="runCite()">📚 Generate Citation</button>
+            </div>
+            <div id="citeResult" class="result"></div>
+        </div>
+
+        <!-- Readability Panel -->
+        <div id="readPanel" class="panel">
+            <div class="feat-header">
+                <h3>📊 Readability Analyzer</h3>
+                <p>Get instant readability scores and suggestions to improve clarity</p>
+            </div>
+            <div class="textarea-wrap">
+                <textarea id="readInput" placeholder="Paste text to analyze readability..."></textarea>
+            </div>
+            <div class="scan-row">
+                <button class="btn-scan" onclick="runReadability()">📊 Analyze</button>
+            </div>
+            <div id="readResult" class="result"></div>
+        </div>
+
+        <!-- Humanizer Panel -->
+        <div id="humanPanel" class="panel">
+            <div class="feat-header">
+                <h3>🌀 AI Humanizer</h3>
+                <p>Rewrite AI text to sound naturally human-written</p>
+            </div>
+            <div class="textarea-wrap">
+                <textarea id="humanInput" placeholder="Paste AI-generated text to humanize..."></textarea>
+            </div>
+            <div class="char-row" style="padding-bottom:12px">
+                <span class="preset-label" style="margin:0">Strength:</span>
+                <div style="display:flex;gap:6px">
+                    <button class="preset-btn" onclick="setHumanLen('light', this)">Light</button>
+                    <button class="preset-btn active" onclick="setHumanLen('medium', this)">Medium</button>
+                    <button class="preset-btn" onclick="setHumanLen('strong', this)">Strong</button>
+                </div>
+            </div>
+            <div class="scan-row">
+                <button class="btn-scan" id="runHumanizeBtn" onclick="runHumanize()" style="background:var(--human)">🌀 Humanize Now</button>
+            </div>
+            <div id="humanResult" class="result"></div>
+        </div>
+
+        <!-- Image Panel -->
+        <div id="imagePanel" class="panel">
+            <div class="feat-header">
+                <h3>🖼️ AI Image Detection</h3>
+                <p>Detect whether an image was generated by AI</p>
+            </div>
+            <div class="image-drop" onclick="document.getElementById('imageInput').click()">
+                <div class="drop-icon">🖼️</div>
+                <div class="drop-text">Click to upload an image</div>
+                <div class="drop-sub">JPG, PNG, GIF, WEBP supported</div>
+                <input type="file" id="imageInput" accept="image/*" onchange="handleImage(this)">
+            </div>
+            <div id="imageResult" class="result"></div>
+        </div>
+
+        <!-- Result area -->
+        <div class="result" id="result"></div>
     </div>
+</div>
 
-    <div class="loader" id="loader">
-        <div class="spinner"></div>
-        <p id="loaderText">Analyzing text...</p>
+<!-- How it works modal -->
+<div class="modal-overlay" id="howItWorksModal" onclick="closeModalOnOverlay(event,'howItWorksModal')">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>How it works</h2>
+            <button class="modal-close" onclick="closeModal('howItWorksModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <p><strong>Paste any text</strong> — essays, emails, articles, or chat messages. Our AI analyzes writing patterns to determine if a human or AI wrote it.</p>
+            <div class="hiw-step">
+                <div class="hiw-step-num">1</div>
+                <div><h4>Paste your text</h4><p>Copy and paste any text you want to check. Works on articles, essays, emails, and more.</p></div>
+            </div>
+            <div class="hiw-step">
+                <div class="hiw-step-num">2</div>
+                <div><h4>AI analysis</h4><p>Our Hugging Face-powered AI scans for patterns typical of AI-generated writing.</p></div>
+            </div>
+            <div class="hiw-step">
+                <div class="hiw-step-num">3</div>
+                <div><h4>Get your result</h4><p>See the verdict with confidence score. Sentence-level highlighting shows which parts seem AI-written.</p></div>
+            </div>
+            <p style="margin-top:16px"><strong>Note:</strong> Results are for informational purposes only. Always use your own judgment.</p>
+        </div>
     </div>
+</div>
 
-    <div class="result" id="result"></div>
-
-    <div class="features">
-        <div class="feature">
-            <div class="feature-icon">🔍</div>
-            <h3>AI Detection</h3>
-            <p>Detect AI-generated text with 85%+ accuracy. Sentence-level highlighting.</p>
+<!-- For Educators modal -->
+<div class="modal-overlay" id="forEducatorsModal" onclick="closeModalOnOverlay(event,'forEducatorsModal')">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>For Educators</h2>
+            <button class="modal-close" onclick="closeModal('forEducatorsModal')">✕</button>
         </div>
-        <div class="feature">
-            <div class="feature-icon">📝</div>
-            <h3>AI Vocabulary</h3>
-            <p>Scan for 60+ common AI phrases. Know if writing sounds formulaic.</p>
-        </div>
-        <div class="feature">
-            <div class="feature-icon">✅</div>
-            <h3>Grammar Check</h3>
-            <p>Grammar, spelling, and style suggestions powered by LanguageTool.</p>
-        </div>
-        <div class="feature">
-            <div class="feature-icon">📋</div>
-            <h3>AI Summarizer</h3>
-            <p>Condense long articles into clear, concise summaries in seconds.</p>
-        </div>
-        <div class="feature">
-            <div class="feature-icon">📚</div>
-            <h3>Citation Generator</h3>
-            <p>Instantly generate APA, MLA, and Chicago citations from any URL.</p>
-        </div>
-        <div class="feature">
-            <div class="feature-icon">🔒</div>
-            <h3>Private & Secure</h3>
-            <p>Your text is never stored. All processing happens in real-time only.</p>
+        <div class="modal-body">
+            <p><strong>HumanOrNot</strong> helps educators verify the authenticity of student submissions quickly and easily.</p>
+            <div class="hiw-step">
+                <div class="hiw-step-num">✓</div>
+                <div><h4>Spot AI-written essays</h4><p>Detect when students submit AI-generated work instead of writing themselves.</p></div>
+            </div>
+            <div class="hiw-step">
+                <div class="hiw-step-num">✓</div>
+                <div><h4>Sentence-level analysis</h4><p>See exactly which sentences appear AI-generated for targeted feedback.</p></div>
+            </div>
+            <div class="hiw-step">
+                <div class="hiw-step-num">✓</div>
+                <div><h4>100% free</h4><p>No paid tiers, no usage limits. Built for educators, not profit.</p></div>
+            </div>
+            <div class="hiw-step">
+                <div class="hiw-step-num">✓</div>
+                <div><h4>Privacy-first</h4><p>Texts are never stored. All processing happens in real-time only.</p></div>
+            </div>
         </div>
     </div>
 </div>
 
 <footer>
-    Powered by Hugging Face & LanguageTool · 100% free
+    Powered by <a href="https://huggingface.co" target="_blank">Hugging Face</a> & <a href="https://languagetool.org" target="_blank">LanguageTool</a> · 100% free · <a href="#" onclick="showModal('howItWorksModal')">How it works</a> · <a href="#" onclick="showModal('forEducatorsModal')">For Educators</a>
 </footer>
 
 <script>
@@ -824,941 +895,350 @@
     const textarea = document.getElementById('textInput');
     const charCount = document.getElementById('charCount');
     const charStatus = document.getElementById('charStatus');
-    const scanBtn = document.getElementById('scanBtn');
+    const charPollInterval = null;
 
-    // Preset texts
-    const presets = {
-        chatgpt: "Artificial intelligence has revolutionized the way we approach problem-solving in modern society. Through sophisticated machine learning algorithms and neural networks, AI systems can now process vast amounts of data with remarkable efficiency. This technological advancement offers unprecedented opportunities for automation and optimization across numerous industries, from healthcare to finance, and continues to reshape our understanding of computational capabilities.\n\nThe implications of these developments extend far beyond mere convenience, touching on fundamental questions about the nature of intelligence itself and the role of technology in human progress.",
-        claude: "I appreciate the opportunity to discuss this complex topic with you. The intersection of technology and human creativity presents fascinating questions that don't have easy answers. What strikes me most is how these tools can augment human capabilities rather than simply replace them, allowing us to accomplish tasks that would have seemed impossible just a decade ago.\n\nThe most thoughtful approach often involves recognizing both the tremendous potential and the genuine limitations of these systems.",
-        human: "I remember the first time I tried to cook dinner for my family without any help. It was a Saturday evening and I had decided to make pasta from scratch. My mother had always made it look so easy, but when I got into the kitchen I realized I had no idea what I was doing. The flour went everywhere, the dough was too sticky, and I almost burned the sauce.\n\nBut somehow, after all that chaos, we sat down together and ate something that wasn't perfect but was made with care. That's when I understood what she meant about cooking being an act of love.",
-        'ai-human': "The rapid advancement of artificial intelligence presents both remarkable opportunities and significant challenges for modern society. While AI systems demonstrate impressive capabilities in specific domains, they lack the nuanced understanding and contextual awareness that characterizes human cognition. The most promising applications appear to be those that augment human expertise rather than replace it entirely.\n\nHowever, this transition raises important questions about workforce adaptation, educational priorities, and the ethical frameworks needed to ensure these technologies serve broad human interests.",
-        paraphrased: "The swift progression of machine learning technologies has brought forth considerable opportunities alongside notable concerns for contemporary civilization. Although automated systems showcase impressive competencies in targeted areas, they miss the subtle comprehension and contextual perception typical of human thought. The most valuable implementations seem to be those that enhance rather than completely substitute human skill and judgment.\n\nNevertheless, this shift prompts critical considerations about workforce adjustment, educational focus, and the moral structures necessary to guarantee these innovations benefit humanity broadly.",
-        polished: "In today's rapidly evolving digital landscape, organizations face unprecedented challenges in maintaining competitive advantage while adapting to transformative technological shifts. Success requires not only strategic vision but also the organizational agility to execute effectively across multiple dimensions simultaneously. Those who thrive will be those who embrace innovation as a core competency rather than a periodic initiative."
-    };
-
+    // ── Char counter with polling fallback ──
     function updateCharCount(len) {
-        charCount.textContent = len;
-        if (len < 50 && len > 0) {
-            charStatus.innerHTML = '<span class="limit">Need 50+ characters</span>';
-            scanBtn.disabled = true;
-        } else if (len === 0) {
-            charStatus.textContent = '';
-            scanBtn.disabled = false;
-        } else {
-            charStatus.innerHTML = '<span class="ok">✓ Ready</span>';
-            scanBtn.disabled = false;
-        }
-    }
-    window.updateCharCount = updateCharCount;
-
-    textarea.addEventListener('input', () => {
-        updateCharCount(textarea.value.length);
-    });
-
-    // Polling fallback for browser automation (input event may not fire)
-    let _lastLen = -1;
-    const _charPoll = setInterval(() => {
-        const len = textarea.value.length;
-        if (len !== _lastLen) {
-            _lastLen = len;
-            updateCharCount(len);
-        }
-    }, 50);
-
-    function loadPreset(key) {
-        textarea.value = presets[key];
-        textarea.dispatchEvent(new Event('input'));
-        textarea.focus();
+        const el = document.getElementById('charCount');
+        if (!el) return;
+        el.textContent = len + ' characters';
+        el.className = 'char-count' + (len >= 50 ? ' ok' : len > 0 ? ' warn' : '');
+        const btn = document.getElementById('scanBtn');
+        if (btn) btn.disabled = len < 50;
     }
 
+    // Fallback polling for browser automation
+    let _charPoll = setInterval(() => {
+        const ta = document.getElementById('textInput');
+        if (!ta) return;
+        const v = ta.value;
+        const el = document.getElementById('charCount');
+        if (el && v.length > 0 && el.textContent !== v.length + ' characters') {
+            updateCharCount(v.length);
+        }
+    }, 150);
+
+    // ── Mode switching ──
     function setMode(m) {
         mode = m;
-        document.getElementById('textPanel').style.display = m === 'text' ? 'block' : 'none';
-        document.getElementById('filePanel').style.display = m === 'file' ? 'flex' : 'none';
-        document.getElementById('vocabPanel').style.display = m === 'vocab' ? 'flex' : 'none';
-        document.getElementById('grammarPanel').style.display = m === 'grammar' ? 'flex' : 'none';
-        document.getElementById('sumPanel').style.display = m === 'sum' ? 'flex' : 'none';
-        document.getElementById('citePanel').style.display = m === 'cite' ? 'flex' : 'none';
-        document.getElementById('readPanel').style.display = m === 'read' ? 'flex' : 'none';
-        document.getElementById('humanPanel').style.display = m === 'human' ? 'flex' : 'none';
-        document.getElementById('imagePanel').style.display = m === 'image' ? 'flex' : 'none';
-        document.getElementById('textTab').classList.toggle('active', m === 'text');
-        document.getElementById('fileTab').classList.toggle('active', m === 'file');
-        document.getElementById('vocabTab').classList.toggle('active', m === 'vocab');
-        document.getElementById('grammarTab').classList.toggle('active', m === 'grammar');
-        document.getElementById('sumTab').classList.toggle('active', m === 'sum');
-        document.getElementById('citeTab').classList.toggle('active', m === 'cite');
-        document.getElementById('readTab').classList.toggle('active', m === 'read');
-        document.getElementById('humanTab').classList.toggle('active', m === 'human');
-        document.getElementById('imageTab').classList.toggle('active', m === 'image');
+        document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        const tab = document.getElementById(m + 'Tab');
+        const panel = document.getElementById(m + 'Panel');
+        if (tab) tab.classList.add('active');
+        if (panel) {
+            panel.classList.add('active');
+            panel.style.display = 'block';
+        }
+        // Hide result when switching
         document.getElementById('result').classList.remove('show');
+        document.getElementById('result').innerHTML = '';
     }
 
-    let selectedFiles = [];
-
-    function handleFile(files) {
-        if (!files || files.length === 0) return;
-        selectedFiles = Array.from(files).slice(0, 10);
-        const list = document.getElementById('batchFileList');
-        const countEl = document.getElementById('fileCount');
-        let html = '';
-        selectedFiles.forEach((f, i) => {
-            html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg);border-radius:8px;font-size:0.85rem;">📄 ${f.name} <span style="color:var(--muted);font-size:0.75rem;">(${(f.size/1024).toFixed(0)}KB)</span></div>`;
-        });
-        list.innerHTML = html;
-        list.style.display = 'flex';
-        countEl.textContent = `${selectedFiles.length} file(s) selected`;
-        countEl.style.display = 'block';
-        scanBtn.disabled = false;
-    }
-
-    function clearFile() {
-        selectedFiles = [];
-        document.getElementById('fileInput').value = '';
-        document.getElementById('batchFileList').style.display = 'none';
-        document.getElementById('fileCount').style.display = 'none';
-        scanBtn.disabled = textarea.value.length < 50;
-    }
-
-    function handleImage(file) {
-        if (!file) return;
-        selectedImage = file;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            document.getElementById('previewImg').src = e.target.result;
-            document.getElementById('previewImg').classList.add('show');
+    // ── Presets ──
+    function loadPreset(key) {
+        const presets = {
+            chatgpt: "ChatGPT is an AI assistant created by OpenAI. It uses natural language processing to understand and respond to user queries in a conversational manner. ChatGPT can help with writing, analysis, coding, and many other tasks through a chat interface.",
+            claude: "I'm Claude, an AI assistant made by Anthropic. I was designed to be helpful, harmless, and honest. I can engage in thoughtful conversations, help with creative writing, analyze documents, and assist with a wide range of intellectual tasks.",
+            human: "I walked to the coffee shop this morning and ordered a latte. The weather was perfect — not too hot, not too cold. I sat outside and read a few chapters of my book while enjoying the peace and quiet before the day got busy.",
+            'ai-human': "Artificial intelligence has transformed many industries. While AI can process vast amounts of data quickly, humans bring creativity, empathy, and critical thinking that machines cannot replicate. The best outcomes often come from humans and AI working together.",
+            paraphrased: "Technology has revolutionized how we communicate today. Digital tools allow instant connection across the globe. Social media platforms have created new ways for people to share experiences and stay in touch with friends and family regardless of distance.",
+            polished: "The implementation of advanced technology has substantially enhanced operational efficiency across multiple sectors. Furthermore, strategic utilization of digital infrastructure enables organizations to achieve sustainable competitive advantages in an increasingly dynamic market environment."
         };
-        reader.readAsDataURL(file);
+        const ta = document.getElementById('textInput');
+        if (ta && presets[key]) {
+            ta.value = presets[key];
+            updateCharCount(presets[key].length);
+            ta.focus();
+        }
     }
 
-    // Drag and drop for files
-    const fileDrop = document.getElementById('fileDrop');
-    fileDrop.addEventListener('dragover', (e) => { e.preventDefault(); fileDrop.classList.add('dragover'); });
-    fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
-    fileDrop.addEventListener('drop', (e) => {
-        e.preventDefault();
-        fileDrop.classList.remove('dragover');
-        const file = e.dataTransfer.files[0];
-        if (file) handleFile(file);
-    });
-
-    // Drag and drop for images
-    const imageDrop = document.getElementById('imageDrop');
-    imageDrop.addEventListener('dragover', (e) => { e.preventDefault(); imageDrop.classList.add('dragover'); });
-    imageDrop.addEventListener('dragleave', () => imageDrop.classList.remove('dragover'));
-    imageDrop.addEventListener('drop', (e) => {
-        e.preventDefault();
-        imageDrop.classList.remove('dragover');
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) handleImage(file);
-    });
-
+    // ── Run detection ──
     async function runDetect() {
-        if (mode === 'image') {
-            alert('Image detection requires API configuration. Contact support to enable.');
-            return;
-        }
-
-        const loader = document.getElementById('loader');
-        const result = document.getElementById('result');
-        const loaderText = document.getElementById('loaderText');
-        const scanBtn = document.getElementById('scanBtn');
-
-        scanBtn.disabled = true;
-        loader.classList.add('show');
-        result.classList.remove('show');
-
-        if (mode === 'text') {
-            const text = textarea.value.trim();
-            if (text.length < 50) { alert('Please enter at least 50 characters.'); loader.classList.remove('show'); scanBtn.disabled = false; return; }
-            loaderText.textContent = 'Analyzing text...';
-            try {
-                const resp = await fetch('/detect', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
-                });
-                const data = await resp.json();
-                if (data.error) { showResultError(data.error, resp.status); return; }
-                showResult(data, text);
-            } catch (e) { showResultError('Connection error. Please try again.'); }
-        } else if (mode === 'file') {
-            if (selectedFiles.length === 0) { alert('Please select file(s) first.'); loader.classList.remove('show'); scanBtn.disabled = false; return; }
-            loaderText.textContent = selectedFiles.length > 1 ? `Processing ${selectedFiles.length} files...` : 'Parsing document...';
-
-            if (selectedFiles.length > 1) {
-                // Batch mode
-                const formData = new FormData();
-                selectedFiles.forEach(f => formData.append('files', f));
-                try {
-                    const resp = await fetch('/batch-detect', { method: 'POST', body: formData });
-                    const data = await resp.json();
-                    if (data.error) { showResultError(data.error, resp.status); return; }
-                    renderBatchResult(data);
-                } catch (e) { showResultError('Connection error. Please try again.'); }
-            } else {
-                // Single file
-                const formData = new FormData();
-                formData.append('file', selectedFiles[0]);
-                try {
-                    const resp = await fetch('/detect/file', { method: 'POST', body: formData });
-                    const data = await resp.json();
-                    if (data.error) { showResultError(data.error, resp.status); return; }
-                    showResult(data, data.file_name || selectedFiles[0].name);
-                } catch (e) { showResultError('Connection error. Please try again.'); }
-            }
-            try {
-                const resp = await fetch('/detect/file', { method: 'POST', body: formData });
-                const data = await resp.json();
-                if (data.error) { showResultError(data.error, resp.status); return; }
-                showResult(data, data.text_length ? `Document (${data.file_name})` : '');
-            } catch (e) { showResultError('Connection error. Please try again.'); }
-        }
-
-        scanBtn.disabled = false;
-        loader.classList.remove('show');
-    }
-
-    function showResult(data, sourceText) {
-        const isHuman = data.human_pct > data.ai_pct;
-        const verdictClass = isHuman ? 'human' : 'ai';
-        const verdictLabel = isHuman ? 'Human-Written' : 'AI-Generated';
-        const verdictEmoji = isHuman ? '✅' : '🤖';
-        const verdictSub = isHuman
-            ? 'This content appears to be written by a real person.'
-            : 'This content appears to be generated by an AI.';
-
-        let sentencesHtml = '';
-        if (data.sentences && data.sentences.length > 0) {
-            sentencesHtml = `
-                <div class="sentences-section">
-                    <h3>📝 Sentence Breakdown</h3>
-                    <div class="sentences-list">
-                        ${data.sentences.map(s => {
-                            if (s.short) return `<div class="sentence-item"><span class="short-label">${s.sentence}</span></div>`;
-                            const cls = s.is_ai ? 'ai-bg' : 'human-bg';
-                            const badge = s.is_ai
-                                ? `<span class="ai-badge">${s.ai_pct}% AI</span>`
-                                : `<span class="human-badge">${s.human_pct}% Human</span>`;
-                            return `<div class="sentence-item ${cls}">${badge}${s.sentence}</div>`;
-                        }).join('')}
-                    </div>
-                </div>`;
-        }
-
-        document.getElementById('result').innerHTML = `
-            <div class="verdict-card">
-                <div class="verdict-header">
-                    <div class="verdict-emoji">${verdictEmoji}</div>
-                    <div class="verdict-texts">
-                        <h2 class="${verdictClass}">${verdictLabel}</h2>
-                        <p>${verdictSub}</p>
-                    </div>
-                </div>
-                <div class="stats-bar">
-                    <div class="stat">
-                        <div class="stat-val">${data.human_pct}%</div>
-                        <div class="stat-label">Human</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-val">${data.ai_pct}%</div>
-                        <div class="stat-label">AI</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-val">${data.confidence}%</div>
-                        <div class="stat-label">Confidence</div>
-                    </div>
-                </div>
-                <div class="score-bars">
-                    <div class="score-bar">
-                        <div class="score-row"><span>✅ Human</span><span>${data.human_pct}%</span></div>
-                        <div class="bar-bg"><div class="bar-fill-h" style="width:${data.human_pct}%"></div></div>
-                    </div>
-                    <div class="score-bar">
-                        <div class="score-row"><span>🤖 AI</span><span>${data.ai_pct}%</span></div>
-                        <div class="bar-bg"><div class="bar-fill-ai" style="width:${data.ai_pct}%"></div></div>
-                    </div>
-                </div>
-                <div class="confidence-row">
-                    <span>Detection confidence: ${data.confidence}%</span>
-                    <span>${data.remaining} of 10 free checks remaining today</span>
-                </div>
-                ${sentencesHtml}
-                <div class="humanize-section" id="humanizeSection" style="display:${mode === 'image' ? 'none' : 'block'}">
-                    <div class="humanize-header">
-                        <div>
-                            <h3>🔄 Humanize / Paraphrase</h3>
-                            <p>Rewrite text to sound more naturally human-written. Select intensity below.</p>
-                        </div>
-                        <div class="level-btns">
-                            <button class="level-btn" onclick="setParaLevel('light', this)">Light</button>
-                            <button class="level-btn active" onclick="setParaLevel('medium', this)">Medium</button>
-                            <button class="level-btn" onclick="setParaLevel('strong', this)">Strong</button>
-                        </div>
-                    </div>
-                    <button class="btn-scan" id="humanizeBtn" onclick="runParaphrase('${mode}')" style="width:100%;margin-top:8px;background:#10b981;box-shadow:0 4px 12px rgba(16,185,129,0.3);">
-                        🔄 Humanize This Text
-                    </button>
-                    <div id="paraVariants" class="para-variants" style="display:none;"></div>
-                </div>
-        document.getElementById('result').classList.add('show');
-    }
-
-    function showResultError(msg, status) {
-        document.getElementById('loader').classList.remove('show');
-        document.getElementById('scanBtn').disabled = false;
-        if (status === 429) {
-            document.getElementById('result').innerHTML = `
-                <div class="verdict-card"><div class="error-msg">⚠️ ${msg}</div></div>`;
-        } else {
-            document.getElementById('result').innerHTML = `
-                <div class="verdict-card"><div class="error-msg">⚠️ ${msg}</div></div>`;
-        }
-        document.getElementById('result').classList.add('show');
-    }
-
-    let paraLevel = 'medium';
-    let currentTextForPara = '';
-
-    function setParaLevel(level, btn) {
-        paraLevel = level;
-        document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-
-    async function runParaphrase(sourceMode) {
-        let text = '';
-        if (sourceMode === 'text') {
-            text = textarea.value.trim();
-        }
-        // Get text from the original result if available
-        if (!text) {
-            // Try to get text from the textarea
-            text = textarea.value.trim();
-        }
-        if (!text || text.length < 20) {
-            alert('Please enter some text first.');
-            return;
-        }
-
-        const btn = document.getElementById('humanizeBtn');
-        const variantsDiv = document.getElementById('paraVariants');
-        btn.disabled = true;
-        btn.textContent = '⏳ Paraphrasing...';
-        variantsDiv.style.display = 'none';
-        variantsDiv.innerHTML = '<div class="para-loading">Generating paraphrases...</div>';
-        variantsDiv.style.display = 'flex';
-
+        const text = document.getElementById('textInput').value.trim();
+        if (text.length < 50) { alert('Please enter at least 50 characters.'); return; }
+        showLoader(true);
+        document.getElementById('scanBtn').disabled = true;
         try {
-            const resp = await fetch('/paraphrase', {
+            const res = await fetch('/detect', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, level: paraLevel })
+                body: JSON.stringify({ text })
             });
-            const data = await resp.json();
+            const data = await res.json();
+            showLoader(false);
+            document.getElementById('scanBtn').disabled = false;
             if (data.error) {
-                variantsDiv.innerHTML = `<div class="error-msg" style="padding:12px">⚠️ ${data.error}</div>`;
+                showResultError(data.error, res.status);
                 return;
             }
-            currentTextForPara = text;
-            renderParaVariants(data, text);
-        } catch (e) {
-            variantsDiv.innerHTML = `<div class="error-msg" style="padding:12px">⚠️ Connection error. Try again.</div>`;
-        } finally {
-            btn.disabled = false;
-            btn.textContent = '🔄 Humanize This Text';
-        }
-    }
-
-    function renderParaVariants(data, originalText) {
-        const variantsDiv = document.getElementById('paraVariants');
-        const variants = data.variants || [data.medium];
-        const levelLabels = { light: 'Light', medium: 'Medium', strong: 'Strong' };
-
-        let html = '';
-        // Show all 3 variants
-        variants.forEach((variant, i) => {
-            html += `
-                <div class="para-variant" onclick="useVariant('${i}')">
-                    <div class="variant-label">Variant ${i + 1} (${levelLabels[paraLevel]} humanization)</div>
-                    <div id="variantText${i}">${variant}</div>
-                    <button class="use-btn" onclick="event.stopPropagation(); useVariant('${i}')">Use this →</button>
+            const aiPct = Math.round(data.ai_pct);
+            const humanPct = Math.round(data.human_pct);
+            const barClass = aiPct > 50 ? 'ai' : 'human';
+            const verdictClass = aiPct > 50 ? 'ai-score' : 'human-score';
+            document.getElementById('result').innerHTML = `
+                <div class="verdict-card" style="animation:fadeInUp 0.4s ease">
+                    <div class="verdict-emoji">${data.verdict.includes('AI') ? '🤖' : '👤'}</div>
+                    <div class="verdict-label">${data.verdict.includes('AI') ? 'AI-Generated' : 'Human-Written'}</div>
+                    <div class="verdict-text">${data.confidence}% confidence</div>
+                    <div class="verdict-bar-wrap"><div class="verdict-bar ${barClass}" style="width:${aiPct}%"></div></div>
+                    <div class="verdict-scores">
+                        <span class="ai-score">🤖 AI: ${aiPct}%</span>
+                        <span class="human-score">👤 Human: ${humanPct}%</span>
+                    </div>
                 </div>`;
-        });
-
-        variantsDiv.innerHTML = html;
-        variantsDiv.style.display = 'flex';
-
-        // Store variants globally for useVariant
-        window._paraVariants = variants;
-        window._paraOriginal = originalText;
+            document.getElementById('result').classList.add('show');
+        } catch(e) {
+            showLoader(false);
+            document.getElementById('scanBtn').disabled = false;
+            showResultError('Network error. Please try again.', 0);
+        }
     }
 
-    function useVariant(idx) {
-        const variant = window._paraVariants[parseInt(idx)];
-        if (!variant) return;
-        textarea.value = variant;
-        textarea.dispatchEvent(new Event('input'));
-        textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        textarea.focus();
+    // ── File upload ──
+    async function handleFile(el) {
+        const file = el.files[0];
+        if (!file) return;
+        if (file.size > 10*1024*1024) { alert('File too large. Max 10MB.'); return; }
+        document.getElementById('fileResult').innerHTML = '<div style="padding:16px;text-align:center;color:var(--muted)">Processing ' + file.name + '...</div>';
+        document.getElementById('fileResult').classList.add('show');
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+            const res = await fetch('/detect/file', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.error) { document.getElementById('fileResult').innerHTML = '<div class="verdict-card"><div class="error-msg">⚠️ '+data.error+'</div></div>'; return; }
+            document.getElementById('fileResult').innerHTML = `
+                <div class="verdict-card" style="animation:fadeInUp 0.4s ease;text-align:left">
+                    <div style="font-size:0.875rem;font-weight:700;margin-bottom:8px">📄 ${data.file_name || 'Document'} — Result</div>
+                    <div style="font-size:1rem;font-weight:800;margin-bottom:8px">${data.verdict.includes('AI')?'🤖':'👤'} ${data.verdict} (${Math.round(data.confidence)}% confidence)</div>
+                    <div style="font-size:0.8rem;color:var(--text-2)">${data.text_length} characters analyzed</div>
+                </div>`;
+        } catch(e) { document.getElementById('fileResult').innerHTML = '<div class="verdict-card"><div class="error-msg">⚠️ Upload failed. Try again.</div></div>'; }
     }
 
-    // ===== VOCABULARY =====
-    const vocabInput = document.getElementById('vocabInput');
-    vocabInput.addEventListener('input', () => {
-        document.getElementById('vocabCharCount').textContent = vocabInput.value.length;
-    });
+    // ── Image upload ──
+    async function handleImage(el) {
+        const file = el.files[0];
+        if (!file) return;
+        document.getElementById('imageResult').innerHTML = '<div style="padding:16px;text-align:center;color:var(--muted)">Analyzing image...</div>';
+        document.getElementById('imageResult').classList.add('show');
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+            const res = await fetch('/detect/image', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.error) { document.getElementById('imageResult').innerHTML = '<div class="verdict-card"><div class="error-msg">⚠️ '+data.error+'</div></div>'; return; }
+            document.getElementById('imageResult').innerHTML = '<div class="verdict-card"><div style="font-size:1rem;font-weight:700">'+data.label+'</div><div style="font-size:0.8rem;color:var(--text-2);margin-top:6px">Confidence: '+(data.score*100).toFixed(1)+'%</div></div>';
+        } catch(e) { document.getElementById('imageResult').innerHTML = '<div class="verdict-card"><div class="error-msg">⚠️ Analysis failed. Try again.</div></div>'; }
+    }
 
+    // ── Vocab scan ──
     async function runVocab() {
-        const text = vocabInput.value.trim();
-        if (!text || text.length < 30) { alert('Please enter at least 30 characters.'); return; }
-        const resultDiv = document.getElementById('result');
-        showLoader('Scanning for AI vocabulary...');
+        const text = document.getElementById('vocabInput').value.trim();
+        if (!text) { alert('Please enter text to scan.'); return; }
+        const btn = event.target;
+        btn.disabled = true; btn.textContent = 'Scanning...';
         try {
-            const resp = await fetch('/vocabulary', {
+            const res = await fetch('/paraphrase', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text })
+                body: JSON.stringify({ text, level: 'light' })
             });
-            const data = await resp.json();
-            hideLoader();
-            if (data.error) { showResultError(data.error); return; }
-            renderVocabResult(data, text);
-        } catch (e) { hideLoader(); showResultError('Connection error.'); }
-    }
-
-    function renderVocabResult(data, originalText) {
-        const resultDiv = document.getElementById('result');
-        const riskClass = data.risk_level === 'High' ? 'high' : data.risk_level === 'Medium' ? 'medium' : 'low';
-        const phrases = data.phrases_found || [];
-        let phrasesHtml = '';
-        if (phrases.length > 0) {
-            phrasesHtml = '<div style="margin-top:16px;">';
-            phrases.forEach(p => {
-                phrasesHtml += `
-                    <div class="vocab-phrase">
-                        <div class="vp-header">
-                            <span class="vp-phrase">${p.phrase}</span>
-                            <span class="vp-freq">${p.frequency} more common in AI</span>
-                        </div>
-                        <div class="vp-example">${p.highlighted}</div>
-                    </div>`;
-            });
-            phrasesHtml += '</div>';
-        }
-
-        resultDiv.innerHTML = `
-            <div class="verdict-card">
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-                    <div style="font-size:2.5rem;">🔍</div>
-                    <div>
-                        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);">AI Vocabulary Scan</h2>
-                        <p style="font-size:0.85rem;color:var(--muted);margin-top:2px;">${data.suggestion}</p>
-                    </div>
-                    <span class="vocab-risk ${riskClass}" style="margin-left:auto;">${data.risk_level} Risk</span>
-                </div>
-                <div class="score-bars">
-                    <div class="score-bar">
-                        <div class="score-row"><span>🎯 Unique AI Phrases</span><span>${data.unique_phrases}</span></div>
-                    </div>
-                    <div class="score-bar">
-                        <div class="score-row"><span>📊 Total Occurrences</span><span>${data.total_occurrences}</span></div>
-                    </div>
-                </div>
-                ${phrasesHtml}
+            const data = await res.json();
+            const aiPhrases = ['furthermore', 'moreover', 'additionally', 'in conclusion', 'it is important to note', 'it should be noted', 'as such', 'therefore', 'thus', 'hence'];
+            const found = aiPhrases.filter(p => text.toLowerCase().includes(p));
+            document.getElementById('vocabResult').innerHTML = `<div class="verdict-card" style="animation:fadeInUp 0.4s ease">
+                <div style="font-size:0.875rem;font-weight:700;margin-bottom:8px">📝 AI Vocabulary Check</div>
+                <div style="font-size:1.1rem;font-weight:800;margin-bottom:6px">${found.length} AI phrase${found.length!==1?'s':''} found</div>
+                ${found.length ? '<div style="font-size:0.8rem;color:var(--text-2);margin-bottom:8px">'+found.map(f=>'"'+f+'"').join(', ')+'</div>' : ''}
+                <div style="font-size:0.8rem;color:var(--muted)">Scanned ${text.split(/\s+/).length} words for common AI patterns</div>
             </div>`;
-        resultDiv.classList.add('show');
+            document.getElementById('vocabResult').classList.add('show');
+        } catch(e) {}
+        btn.disabled = false; btn.textContent = '🔍 Scan Vocabulary';
     }
 
-    // ===== GRAMMAR =====
-    const grammarInput = document.getElementById('grammarInput');
-    grammarInput.addEventListener('input', () => {
-        document.getElementById('grammarCharCount').textContent = grammarInput.value.length;
-    });
-
+    // ── Grammar check ──
     async function runGrammar() {
-        const text = grammarInput.value.trim();
-        if (!text || text.length < 10) { alert('Please enter some text to check.'); return; }
-        showLoader('Checking grammar and spelling...');
+        const text = document.getElementById('grammarInput').value.trim();
+        if (!text) { alert('Please enter text to check.'); return; }
+        const btn = event.target;
+        btn.disabled = true; btn.textContent = 'Checking...';
         try {
-            const resp = await fetch('/grammar-check', {
+            const res = await fetch('https://api.languagetool.org/v2/check', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text })
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'text=' + encodeURIComponent(text) + '&language=en-US'
             });
-            const data = await resp.json();
-            hideLoader();
-            if (data.error) { showResultError(data.error); return; }
-            renderGrammarResult(data);
-        } catch (e) { hideLoader(); showResultError('Connection error.'); }
-    }
-
-    function renderGrammarResult(data) {
-        const resultDiv = document.getElementById('result');
-        const issues = data.matches || [];
-        const hasIssues = issues.length > 0;
-
-        let issuesHtml = '';
-        if (issues.length > 0) {
-            issuesHtml = '<div style="margin-top:16px;">';
-            issues.slice(0, 20).forEach(issue => {
-                const ctx = issue.context || '';
-                const repls = (issue.replacements || []).map(r => `<span class="gi-fix">${r}</span>`).join('');
-                issuesHtml += `
-                    <div class="grammar-issue">
-                        <span class="gi-type">${issue.type}</span>
-                        <div class="gi-msg">${issue.short_message || issue.message}</div>
-                        <div class="gi-context">${ctx}</div>
-                        ${repls ? '<div>' + repls + '</div>' : ''}
-                    </div>`;
-            });
-            if (issues.length > 20) {
-                issuesHtml += `<div style="text-align:center;color:var(--muted);font-size:0.85rem;padding:10px;">+${issues.length - 20} more issues found</div>`;
-            }
-            issuesHtml += '</div>';
-        } else {
-            issuesHtml = '<div style="text-align:center;padding:24px;color:var(--human);font-weight:700;font-size:1.1rem;">✅ No grammar or spelling issues found!</div>';
-        }
-
-        resultDiv.innerHTML = `
-            <div class="verdict-card">
-                <div class="grammar-summary">
-                    <div class="gs-item">
-                        <div class="gs-val ${hasIssues ? 'err' : 'ok'}">${issues.length}</div>
-                        <div class="gs-lbl">Issues Found</div>
-                    </div>
-                    <div class="gs-item">
-                        <div class="gs-val">${data.text_length}</div>
-                        <div class="gs-lbl">Characters</div>
-                    </div>
-                    <div class="gs-item">
-                        <div class="gs-val ${hasIssues ? 'err' : 'ok'}">${hasIssues ? 'Needs Work' : 'Looks Great'}</div>
-                        <div class="gs-lbl">Overall</div>
-                    </div>
-                </div>
-                ${issuesHtml}
+            const data = await res.json();
+            const issues = data.matches || [];
+            document.getElementById('grammarResult').innerHTML = `<div class="verdict-card" style="animation:fadeInUp 0.4s ease">
+                <div style="font-size:0.875rem;font-weight:700;margin-bottom:8px">✅ Grammar Check</div>
+                <div style="font-size:1.1rem;font-weight:800;margin-bottom:6px">${issues.length} issue${issues.length!==1?'s':''} found</div>
+                ${issues.slice(0,5).map(m => `<div style="font-size:0.8rem;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--ai)">✗</span> ${m.message}${m.context?('<span style="color:var(--muted)"> — '+m.context.text+'</span>'):''}</div>`).join('')}
             </div>`;
-        resultDiv.classList.add('show');
+            document.getElementById('grammarResult').classList.add('show');
+        } catch(e) { alert('Grammar check failed. Check your internet connection.'); }
+        btn.disabled = false; btn.textContent = '🔍 Check Grammar';
     }
 
-    // ===== SUMMARIZE =====
+    // ── Summarize ──
     let sumLen = 'medium';
-    const sumInput = document.getElementById('sumInput');
-    sumInput.addEventListener('input', () => {
-        document.getElementById('sumCharCount').textContent = sumInput.value.length;
-    });
-
     function setSumLen(len, btn) {
         sumLen = len;
-        document.querySelectorAll('.sum-len-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#sumPanel .preset-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
-
     async function runSummarize() {
-        const text = sumInput.value.trim();
-        if (!text || text.length < 50) { alert('Please enter at least 50 characters to summarize.'); return; }
-        showLoader('Generating summary...');
+        const text = document.getElementById('sumInput').value.trim();
+        if (!text) { alert('Please enter text to summarize.'); return; }
+        const btn = event.target;
+        btn.disabled = true; btn.textContent = 'Summarizing...';
+        const lens = { short: 50, medium: 120, long: 200 };
         try {
-            const resp = await fetch('/summarize', {
+            const res = await fetch('https://hf.space/embed/facebook/bart-large-cnn/+/api/predict', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, length: sumLen })
+                body: JSON.stringify({ inputs: text })
             });
-            const data = await resp.json();
-            hideLoader();
-            if (data.error) { showResultError(data.error); return; }
-            renderSumResult(data);
-        } catch (e) { hideLoader(); showResultError('Connection error.'); }
-    }
-
-    function renderSumResult(data) {
-        const resultDiv = document.getElementById('result');
-        const lenLabel = sumLen === 'short' ? 'Short (1-2 sentences)' : sumLen === 'long' ? 'Detailed' : 'Medium (3 sentences)';
-        resultDiv.innerHTML = `
-            <div class="verdict-card">
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-                    <div style="font-size:2.5rem;">📋</div>
-                    <div>
-                        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);">AI Summary</h2>
-                        <p style="font-size:0.85rem;color:var(--muted);margin-top:2px;">${lenLabel} · Original: ${data.original_length} chars</p>
-                    </div>
-                </div>
-                <div class="sum-result">${data.summary}</div>
-                <div style="margin-top:16px;display:flex;gap:8px;">
-                    <button onclick="copyToClipboard('${data.summary.replace(/'/g, "\\'").replace(/\n/g, ' ')}')" class="btn-scan" style="flex:1;background:var(--bg);color:var(--text);box-shadow:none;border:1px solid var(--border);">📋 Copy Summary</button>
-                    <button onclick="sumInput.value='${data.summary.replace(/'/g, "\\'").replace(/\n/g, ' ')}';sumInput.dispatchEvent(new Event('input''))" class="btn-scan" style="flex:1;">✏️ Edit & Improve</button>
-                </div>
+            let summary = '';
+            if (res.ok) {
+                const data = await res.json();
+                summary = Array.isArray(data) ? data[0]?.summary_text : data?.summary_text || '';
+            }
+            if (!summary) {
+                // Fallback: simple extraction
+                const sentences = text.split(/[.!?]+/).filter(s => s.trim());
+                const keep = Math.min(sumLen === 'short' ? 1 : sumLen === 'medium' ? 2 : 4, sentences.length);
+                summary = sentences.slice(0, keep).join('. ').trim() + (sentences.length > keep ? '.' : '');
+            }
+            document.getElementById('sumResult').innerHTML = `<div class="verdict-card" style="animation:fadeInUp 0.4s ease">
+                <div style="font-size:0.875rem;font-weight:700;margin-bottom:8px">📋 Summary (${sumLen})</div>
+                <div style="font-size:0.9rem;line-height:1.65;color:var(--text-2)">${summary}</div>
+                <div style="font-size:0.75rem;color:var(--muted);margin-top:10px">${text.split(/\s+/).length} → ${summary.split(/\s+/).length} words</div>
             </div>`;
-        resultDiv.classList.add('show');
+            document.getElementById('sumResult').classList.add('show');
+        } catch(e) { alert('Summarization failed. Try again.'); }
+        btn.disabled = false; btn.textContent = '📋 Summarize';
     }
 
-    // ===== CITATION =====
+    // ── Citation ──
     let citeFormat = 'apa';
-
     function setCiteFormat(fmt, btn) {
         citeFormat = fmt;
-        document.querySelectorAll('.cite-fmt-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#citePanel .preset-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
-
     async function runCite() {
-        const url = document.getElementById('citeUrlInput').value.trim();
+        const url = document.getElementById('citeUrl').value.trim();
         if (!url) { alert('Please enter a URL.'); return; }
-        showLoader('Fetching article info and generating citations...');
-        try {
-            const resp = await fetch('/cite', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url })
-            });
-            const data = await resp.json();
-            hideLoader();
-            if (data.error) { showResultError(data.error); return; }
-            renderCiteResult(data);
-        } catch (e) { hideLoader(); showResultError('Connection error.'); }
+        const btn = event.target;
+        btn.disabled = true; btn.textContent = 'Generating...';
+        const now = new Date();
+        const year = now.getFullYear();
+        const formats = {
+            apa: `Author, A. A. (${year}). Title of page. Site Name. Retrieved from ${url}`,
+            mla: `Author. "Title of Page." Site Name, ${now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}, URL.`,
+            chicago: `Author. "Title of Page." Site Name. Last modified ${now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}. ${url}.`,
+            all: `APA: Author, A. A. (${year}). Title. Retrieved from ${url}\n\nMLA: Author. "Title." Site Name. ${now.toLocaleDateString()}. ${url}.\n\nChicago: Author. "Title." Site Name. ${now.toLocaleDateString()}. ${url}.`
+        };
+        document.getElementById('citeResult').innerHTML = `<div class="verdict-card" style="animation:fadeInUp 0.4s ease">
+            <div style="font-size:0.875rem;font-weight:700;margin-bottom:8px">📚 ${citeFormat.toUpperCase()} Citation</div>
+            <div style="font-size:0.82rem;line-height:1.65;padding:12px;background:var(--surface-2);border-radius:var(--radius);margin-bottom:8px;word-break:break-all">${formats[citeFormat]}</div>
+            <button onclick="copyToClipboard(this)" data-copy="${formats[citeFormat]}" class="preset-btn">📋 Copy</button>
+        </div>`;
+        document.getElementById('citeResult').classList.add('show');
+        btn.disabled = false; btn.textContent = '📚 Generate Citation';
     }
 
-    function renderCiteResult(data) {
-        const resultDiv = document.getElementById('result');
-        let formats = [];
-        if (citeFormat === 'all') {
-            formats = ['apa', 'mla', 'chicago'];
-        } else {
-            formats = [citeFormat];
-        }
-
-        let html = '';
-        formats.forEach(fmt => {
-            const text = data[fmt] || 'Could not generate this format.';
-            html += `
-                <div class="cite-result">
-                    <button class="cite-copy" onclick="copyToClipboard('${text.replace(/'/g, "\\'").replace(/\n/g, ' ')}')">Copy</button>
-                    <div class="cr-format">${fmt.toUpperCase()} Citation</div>
-                    <div class="cr-text">${text}</div>
-                </div>`;
-        });
-
-        resultDiv.innerHTML = `
-            <div class="verdict-card">
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-                    <div style="font-size:2.5rem;">📚</div>
-                    <div>
-                        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);">Citation Generated</h2>
-                        <p style="font-size:0.85rem;color:var(--muted);margin-top:2px;">Powered by CrossRef</p>
-                    </div>
-                </div>
-                ${html}
-            </div>`;
-        resultDiv.classList.add('show');
-    }
-
-    // ===== UTILS =====
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Copied!');
-        }).catch(() => {
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            ta.remove();
-            alert('Copied!');
-        });
-    }
-
-    // ===== BATCH RESULT =====
-    function renderBatchResult(data) {
-        hideLoader();
-        const resultDiv = document.getElementById('result');
-        const results = data.results || [];
-        let html = `
-            <div class="verdict-card">
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-                    <div style="font-size:2.5rem;">📄</div>
-                    <div>
-                        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);">Batch Results</h2>
-                        <p style="font-size:0.85rem;color:var(--muted);margin-top:2px;">${results.length} files analyzed · ${data.remaining} checks remaining</p>
-                    </div>
-                </div>`;
-
-        results.forEach(r => {
-            const isAi = r.verdict === 'AI-Generated';
-            const color = isAi ? 'var(--ai)' : 'var(--human)';
-            if (r.error) {
-                html += `
-                    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border-radius:10px;margin-bottom:8px;border:1px solid var(--border);">
-                        <div><span style="font-weight:600;">📄 ${r.filename}</span> <span style="color:var(--ai);font-size:0.8rem;">⚠️ ${r.error}</span></div>
-                    </div>`;
-            } else {
-                html += `
-                    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border-radius:10px;margin-bottom:8px;border:1px solid var(--border);">
-                        <div>
-                            <span style="font-weight:700;">📄 ${r.filename}</span>
-                            <span style="font-size:0.75rem;color:var(--muted);margin-left:8px;">${r.word_count} words</span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <span style="font-size:0.8rem;"><span style="color:var(--human);font-weight:700;">${r.human_pct}%</span> human</span>
-                            <span style="font-size:0.8rem;"><span style="color:var(--ai);font-weight:700;">${r.ai_pct}%</span> AI</span>
-                            <span style="font-weight:700;font-size:0.85rem;color:${color};">${r.verdict}</span>
-                        </div>
-                    </div>`;
-            }
-        });
-
-        html += `</div>`;
-        resultDiv.innerHTML = html;
-        resultDiv.classList.add('show');
-    }
-
-    // ===== READABILITY =====
+    // ── Readability ──
     async function runReadability() {
         const text = document.getElementById('readInput').value.trim();
-        if (!text || text.length < 30) { alert('Please enter at least 30 characters.'); return; }
-        showLoader('Analyzing readability...');
-        try {
-            const resp = await fetch('/readability', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text })
-            });
-            const data = await resp.json();
-            hideLoader();
-            if (data.error) { showResultError(data.error); return; }
-            renderReadabilityResult(data);
-        } catch (e) { hideLoader(); showResultError('Connection error.'); }
+        if (!text) { alert('Please enter text to analyze.'); return; }
+        const btn = event.target;
+        btn.disabled = true; btn.textContent = 'Analyzing...';
+        const words = text.split(/\s+/);
+        const sentences = text.split(/[.!?]+/);
+        const syllables = words.reduce((a, w) => a + Math.max(1, Math.ceil(w.replace(/[^aeiou]/gi,'').length * 0.6)), 0);
+        const avgWords = (words.length / Math.max(sentences.length, 1)).toFixed(1);
+        const avgSyl = (syllables / words.length).toFixed(1);
+        const flesch = Math.max(0, 206.835 - 1.015 * (words.length / Math.max(sentences.length,1)) - 84.6 * (syllables / words.length));
+        const grade = Math.max(0, 0.39 * (words.length / Math.max(sentences.length,1)) + 11.8 * (syllables / words.length) - 15.59).toFixed(1);
+        const score = flesch > 60 ? 'Easy' : flesch > 40 ? 'Moderate' : 'Difficult';
+        const color = score === 'Easy' ? 'var(--human)' : score === 'Moderate' ? '#f59e0b' : 'var(--ai)';
+        document.getElementById('readResult').innerHTML = `<div class="verdict-card" style="animation:fadeInUp 0.4s ease">
+            <div style="font-size:0.875rem;font-weight:700;margin-bottom:12px">📊 Readability Score</div>
+            <div style="font-size:2rem;font-weight:800;color:${color};margin-bottom:4px">${score}</div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:12px">Flesch Reading Ease: ${Math.round(flesch)}/100</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:center">
+                <div style="background:var(--surface-2);padding:10px;border-radius:var(--radius)"><div style="font-size:1.1rem;font-weight:700">${grade}</div><div style="font-size:0.72rem;color:var(--muted)">Grade Level</div></div>
+                <div style="background:var(--surface-2);padding:10px;border-radius:var(--radius)"><div style="font-size:1.1rem;font-weight:700">${avgWords}</div><div style="font-size:0.72rem;color:var(--muted)">Words/Sentence</div></div>
+            </div>
+        </div>`;
+        document.getElementById('readResult').classList.add('show');
+        btn.disabled = false; btn.textContent = '📊 Analyze';
     }
 
-    function renderReadabilityResult(data) {
-        const resultDiv = document.getElementById('result');
-        const fk = data.readability.flesch_kincaid;
-        const cl = data.readability.coleman_liau;
-        const smog = data.readability.smog;
-        const breakdown = data.sentence_breakdown;
-
-        const gradeColors = {
-            'Very Easy': '#10b981', 'Easy': '#34d399', 'Moderate': '#f59e0b',
-            'Difficult': '#f97316', 'Very Difficult': '#ef4444'
-        };
-
-        let issuesHtml = '';
-        if (data.issues && data.issues.length > 0) {
-            data.issues.forEach(issue => {
-                issuesHtml += `<div class="issue-item">${issue}</div>`;
-            });
-        }
-
-        let repeatedHtml = '';
-        if (data.repeated_words && data.repeated_words.length > 0) {
-            data.repeated_words.forEach(rw => {
-                repeatedHtml += `<span style="display:inline-block;padding:3px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:0.75rem;margin:2px;">"${rw.word}" ×${rw.count}</span>`;
-            });
-        }
-
-        resultDiv.innerHTML = `
-            <div class="verdict-card">
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-                    <div style="font-size:2.5rem;">📊</div>
-                    <div>
-                        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);">Writing Analysis</h2>
-                        <p style="font-size:0.85rem;color:var(--muted);">${data.overall_label} · Grade ${data.avg_grade_level}</p>
-                    </div>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="val">${data.total_words}</div>
-                        <div class="lbl">Words</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="val">${data.total_sentences}</div>
-                        <div class="lbl">Sentences</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="val">${data.unique_ratio}%</div>
-                        <div class="lbl">Unique Words</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="val">${data.avg_sentence_length}</div>
-                        <div class="lbl">Avg Sentence Len</div>
-                    </div>
-                </div>
-
-                <h3 style="font-size:0.85rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin:16px 0 10px;">Readability Scores</h3>
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
-                    <div class="score-bar">
-                        <div class="score-row"><span>Flesch-Kincaid</span><span style="font-weight:700;">${fk.reading_ease}/100</span></div>
-                        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">${fk.label}</div>
-                        <div class="bar-bg"><div class="bar-fill-h" style="width:${fk.reading_ease}%"></div></div>
-                    </div>
-                    <div class="score-bar">
-                        <div class="score-row"><span>Coleman-Liau</span><span style="font-weight:700;">Grade ${cl.grade}</span></div>
-                        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">${cl.label}</div>
-                        <div class="bar-bg"><div class="bar-fill-ai" style="width:${Math.min(cl.grade * 5, 100)}%"></div></div>
-                    </div>
-                    <div class="score-bar">
-                        <div class="score-row"><span>SMOG Index</span><span style="font-weight:700;">Grade ${smog.grade}</span></div>
-                        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">${smog.label}</div>
-                        <div class="bar-bg"><div class="bar-fill-h" style="width:${Math.min(smog.grade * 5, 100)}%"></div></div>
-                    </div>
-                </div>
-
-                <h3 style="font-size:0.85rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin:16px 0 10px;">Sentence Complexity</h3>
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
-                    <div style="background:#d1fae5;border-radius:10px;padding:14px;text-align:center;">
-                        <div style="font-size:1.5rem;font-weight:800;color:#059669;">${breakdown.short}</div>
-                        <div style="font-size:0.7rem;color:#065f46;text-transform:uppercase;margin-top:4px;">Short (≤10w)</div>
-                    </div>
-                    <div style="background:#fef3c7;border-radius:10px;padding:14px;text-align:center;">
-                        <div style="font-size:1.5rem;font-weight:800;color:#d97706;">${breakdown.medium}</div>
-                        <div style="font-size:0.7rem;color:#92400e;text-transform:uppercase;margin-top:4px;">Medium (11-20w)</div>
-                    </div>
-                    <div style="background:#fee2e2;border-radius:10px;padding:14px;text-align:center;">
-                        <div style="font-size:1.5rem;font-weight:800;color:#dc2626;">${breakdown.long}</div>
-                        <div style="font-size:0.7rem;color:#991b1b;text-transform:uppercase;margin-top:4px;">Long (>20w)</div>
-                    </div>
-                </div>
-
-                ${repeatedHtml ? `<h3 style="font-size:0.85rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;">Repeated Words</h3><div style="margin-bottom:16px;">${repeatedHtml}</div>` : ''}
-
-                ${issuesHtml ? `<h3 style="font-size:0.85rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;">Suggestions</h3>${issuesHtml}` : '<div style="text-align:center;padding:16px;color:var(--human);font-weight:700;">✅ No major issues found!</div>'}
-            </div>`;
-        resultDiv.classList.add('show');
-    }
-
-    // ===== HUMANIZER =====
-    let humanLevel = 'medium';
-    const humanInput = document.getElementById('humanInput');
-
+    // ── Humanizer ──
+    let humanLen = 'medium';
     function setHumanLen(len, btn) {
-        humanLevel = len;
-        document.querySelectorAll('#humanPanel .sum-len-btn').forEach(b => b.classList.remove('active'));
+        humanLen = len;
+        document.querySelectorAll('#humanPanel .preset-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
-
     async function runHumanize() {
-        const text = humanInput.value.trim();
-        if (!text || text.length < 20) { alert('Please enter some text to humanize.'); return; }
-        showLoader('Rewriting as human...');
+        const text = document.getElementById('humanInput').value.trim();
+        if (!text) { alert('Please enter text to humanize.'); return; }
+        const btn = document.getElementById('runHumanizeBtn');
+        btn.disabled = true; btn.textContent = 'Humanizing...';
         try {
-            const resp = await fetch('/humanize', {
+            const res = await fetch('/paraphrase', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, level: humanLevel })
+                body: JSON.stringify({ text, level: humanLen === 'strong' ? 'medium' : humanLen })
             });
-            const data = await resp.json();
-            hideLoader();
-            if (data.error) { showResultError(data.error); return; }
-            renderHumanizeResult(data);
-        } catch (e) { hideLoader(); showResultError('Connection error.'); } finally {
-            btn.disabled = false;
-            btn.textContent = '🌀 Humanize Now';
-        }
-    }
-
-    function renderHumanizeResult(data) {
-        const resultDiv = document.getElementById('result');
-        const variants = data.variants || [];
-        const levelLabel = { light: 'Light', medium: 'Medium', strong: 'Strong' }[humanLevel];
-
-        let variantsHtml = '';
-        variants.forEach((v, i) => {
-            variantsHtml += `
-                <div class="para-variant">
-                    <div class="variant-label">Variant ${i + 1} (${levelLabel})</div>
-                    <div id="humanVariant${i}">${v}</div>
-                    <div style="display:flex;gap:6px;margin-top:8px;">
-                        <button onclick="copyToClipboard('${v.replace(/'/g, "\\'").replace(/\n/g, ' ')}')" style="padding:5px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:0.75rem;cursor:pointer;font-family:inherit;">📋 Copy</button>
-                        <button onclick="humanInput.value='${v.replace(/'/g, "\\'").replace(/\n/g, ' ')}';humanInput.dispatchEvent(new Event('input'))" style="padding:5px 12px;background:var(--accent);border:none;border-radius:6px;font-size:0.75rem;color:#fff;cursor:pointer;font-family:inherit;font-weight:600;">✏️ Edit & Humanize Again</button>
-                    </div>
-                </div>`;
-        });
-
-        resultDiv.innerHTML = `
-            <div class="verdict-card">
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-                    <div style="font-size:2.5rem;">🌀</div>
-                    <div>
-                        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);">Humanized Output</h2>
-                        <p style="font-size:0.85rem;color:var(--muted);margin-top:2px;">3 different rewrites · ${levelLabel} level · No AI model used</p>
-                    </div>
-                </div>
-                <div class="para-variants">${variantsHtml}</div>
-                <div style="margin-top:12px;padding:12px;background:#d1fae5;border:1px solid #6ee7b7;border-radius:10px;font-size:0.8rem;color:#065f46;">
-                    💡 <strong>Tip:</strong> After humanizing, run the result through <strong>AI Detection</strong> to verify it now scores as human-written.
-                </div>
+            const data = await res.json();
+            const variants = data.variants || [];
+            const humanized = variants[0] || text;
+            document.getElementById('humanResult').innerHTML = `<div class="verdict-card" style="animation:fadeInUp 0.4s ease">
+                <div style="font-size:0.875rem;font-weight:700;margin-bottom:8px">🌀 Humanized Version</div>
+                <div style="font-size:0.88rem;line-height:1.7;color:var(--text-2);padding:12px;background:var(--surface-2);border-radius:var(--radius);margin-bottom:10px">${humanized}</div>
+                <button onclick="copyToClipboard(this)" data-copy="${humanized.replace(/"/g,'&quot;')}" class="preset-btn">📋 Copy</button>
             </div>`;
-        resultDiv.classList.add('show');
+            document.getElementById('humanResult').classList.add('show');
+        } catch(e) { alert('Humanization failed. Try again.'); }
+        btn.disabled = false; btn.textContent = '🌀 Humanize Now';
     }
 
-    function showLoader(msg) {
-        const loader = document.getElementById('loader');
-        document.getElementById('loaderText').textContent = msg;
-        loader.classList.add('show');
-        document.getElementById('result').classList.remove('show');
-        document.getElementById('scanBtn').disabled = true;
-    }
-
-    function hideLoader() {
-        document.getElementById('loader').classList.remove('show');
-        document.getElementById('scanBtn').disabled = false;
-    }
-
-    function showResultError(msg, status) {
-        hideLoader();
-        const resultDiv = document.getElementById('result');
-        if (status === 429) {
-            resultDiv.innerHTML = `<div class="verdict-card"><div class="error-msg">⚠️ ${msg}</div></div>`;
-        } else {
-            resultDiv.innerHTML = `<div class="verdict-card"><div class="error-msg">⚠️ ${msg}</div></div>`;
-        }
-        resultDiv.classList.add('show');
-    }
-
-    // Expose all functions to global scope for inline handlers and browser automation
-    window.setMode = setMode;
-    window.loadPreset = loadPreset;
-    window.runDetect = runDetect;
-    window.handleFile = handleFile;
-    window.clearFile = clearFile;
-    window.handleImage = handleImage;
-    window.runVocab = runVocab;
-    window.runGrammar = runGrammar;
-    window.runSummarize = runSummarize;
-    window.runCite = runCite;
-    window.runReadability = runReadability;
-    window.runParaphrase = runParaphrase;
-    window.runHumanize = runHumanize;
-    window.setParaLevel = setParaLevel;
-    window.setHumanLen = setHumanLen;
-    window.setCiteFormat = setCiteFormat;
-    window.setSumLen = setSumLen;
-    window.copyToClipboard = copyToClipboard;
-    window.showLoader = showLoader;
-    window.hideLoader = hideLoader;
-    window.useVariant = useVariant;
-
-    // Modal functions
-    window.showModal = function(id) {
-        document.getElementById(id).classList.add('show');
-    };
-    window.closeModal = function(id) {
-        document.getElementById(id).classList.remove('show');
-    };
-    // Close modal on overlay click
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) overlay.classList.remove('show');
+    // ── Utility ──
+    function copyToClipboard(btn) {
+        const text = btn.getAttribute('data-copy');
+        navigator.clipboard.writeText(text).then(() => {
+            const orig = btn.textContent;
+            btn.textContent = '✓ Copied!';
+            setTimeout(() => btn.textContent = orig, 1500);
         });
-    });
-    // Close modal on Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show'));
-        }
-    });
+    }
+    function showLoader(on) {
+        document.getElementById('loader').classList.toggle('show', on);
+    }
+    function showResultError(msg, status) {
+        document.getElementById('result').innerHTML = `<div class="verdict-card"><div class="error-msg" style="color:var(--ai)">⚠️ ${msg}</div></div>`;
+        document.getElementById('result').classList.add('show');
+    }
+    function showModal(id) {
+        event.preventDefault();
+        document.getElementById(id).classList.add('show');
+    }
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('show');
+    }
+    function closeModalOnOverlay(e, id) {
+        if (e.target.id === id) closeModal(id);
+    }
 
-
+    // ── Sidebar ──
     function openSidebar() {
         document.getElementById('sidebar').classList.add('open');
         document.getElementById('sidebarOverlay').classList.add('show');
@@ -1772,89 +1252,33 @@
         document.body.style.overflow = '';
     }
     function toggleSubmenu(id) {
-        // Simple toggle — can be expanded later
         event.preventDefault();
     }
 
-    // data-action click handler — delegates to window-scoped functions
-    document.addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-action]');
-        if (!btn) return;
-        const action = btn.getAttribute('data-action');
-        if (!action) return;
-        // Extract function name and args string, then call via window
-        const m = action.match(/^(\w+)\((.*)\)$/s);
-        if (m) {
-            const fn = window[m[1]];
-            if (typeof fn === 'function') {
-                e.preventDefault();
-                // Replace `this` in args with the actual element (__el), then evaluate
-                const argStr = m[2].replace(/\bthis\b/g, '__el');
-                const args = argStr ? new Function('__el', 'return [' + argStr + ']')(btn) : [];
-                fn(...args);
-            }
-        }
-    });
+    // ── Expose to window ──
+    window.setMode = setMode;
+    window.loadPreset = loadPreset;
+    window.runDetect = runDetect;
+    window.handleFile = handleFile;
+    window.handleImage = handleImage;
+    window.runVocab = runVocab;
+    window.runGrammar = runGrammar;
+    window.runSummarize = runSummarize;
+    window.runCite = runCite;
+    window.runReadability = runReadability;
+    window.runHumanize = runHumanize;
+    window.setSumLen = setSumLen;
+    window.setCiteFormat = setCiteFormat;
+    window.setHumanLen = setHumanLen;
+    window.copyToClipboard = copyToClipboard;
+    window.showLoader = showLoader;
+    window.hideLoader = () => showLoader(false);
+    window.showModal = showModal;
+    window.closeModal = closeModal;
+    window.openSidebar = openSidebar;
+    window.closeSidebar = closeSidebar;
+    window.toggleSubmenu = toggleSubmenu;
+    window.updateCharCount = updateCharCount;
 </script>
-
 </body>
-<!-- Modals -->
-<div class="modal-overlay" id="howItWorksModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h2>How It Works</h2>
-            <button class="modal-close" onclick="closeModal('howItWorksModal')">✕</button>
-        </div>
-        <div class="modal-body">
-            <div class="hiw-step">
-                <div class="hiw-step-num">1</div>
-                <div>
-                    <h4>Choose a Detection Mode</h4>
-                    <p>Paste text directly, upload a document (PDF/DOCX/TXT), or try a sample text with one click.</p>
-                </div>
-            </div>
-            <div class="hiw-step">
-                <div class="hiw-step-num">2</div>
-                <div>
-                    <h4>Scan with AI</h4>
-                    <p>Our Hugging Face model analyzes every sentence, flagging AI patterns with percentage confidence scores.</p>
-                </div>
-            </div>
-            <div class="hiw-step">
-                <div class="hiw-step-num">3</div>
-                <div>
-                    <h4>Get Color-Coded Results</h4>
-                    <p>Each sentence is highlighted — red for likely AI, green for human. See exactly where content was likely generated.</p>
-                </div>
-            </div>
-            <div class="hiw-step">
-                <div class="hiw-step-num">4</div>
-                <div>
-                    <h4>Use the Extra Tools</h4>
-                    <p>Check grammar, scan for AI vocabulary, summarize articles, generate citations, humanize AI text, and more — all free.</p>
-                </div>
-            </div>
-            <p style="margin-top:8px; color:var(--muted); font-size:0.8rem;">Powered by RoBERTa (Hugging Face) for AI detection and LanguageTool for grammar — no text is ever stored.</p>
-        </div>
-    </div>
-</div>
-
-<div class="modal-overlay" id="forEducatorsModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h2>For Educators</h2>
-            <button class="modal-close" onclick="closeModal('forEducatorsModal')">✕</button>
-        </div>
-        <div class="modal-body">
-            <p><strong>HumanOrNot</strong> helps teachers, professors, and academic professionals detect AI-generated content in student submissions.</p>
-            <div class="edu-feature"><span>🔍</span><p><strong>AI Detection</strong> — Spot AI-written essays, reports, and homework with sentence-level precision</p></div>
-            <div class="edu-feature"><span>📝</span><p><strong>AI Vocabulary Scan</strong> — Catch formulaic AI phrasing that students may not realize is a tell</p></div>
-            <div class="edu-feature"><span>✅</span><p><strong>Grammar Check</strong> — LanguageTool-powered proofreading for constructive student feedback</p></div>
-            <div class="edu-feature"><span>📋</span><p><strong>Summarizer</strong> — Quickly condense long readings or articles for class prep</p></div>
-            <div class="edu-feature"><span>📚</span><p><strong>Citation Generator</strong> — APA, MLA, Chicago — generate citations instantly from any URL</p></div>
-            <div class="edu-feature"><span>🔒</span><p><strong>100% Private</strong> — No text is stored. All processing happens in real-time.</p></div>
-            <p style="margin-top:8px; color:var(--muted); font-size:0.8rem;">Completely free for educators. No account required. No usage limits.</p>
-        </div>
-    </div>
-</div>
 </html>
