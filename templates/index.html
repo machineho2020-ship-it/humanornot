@@ -395,7 +395,6 @@
     <div class="nav-links">
         <a href="#">How it works</a>
         <a href="#">For Educators</a>
-        <a href="/upgrade" class="nav-cta">Upgrade to Pro</a>
     </div>
 </nav>
 
@@ -416,7 +415,7 @@
             <button class="mode-tab" id="citeTab" onclick="setMode('cite')">📚 Cite</button>
             <button class="mode-tab" id="readTab" onclick="setMode('read')">📊 Readability</button>
             <button class="mode-tab" id="humanTab" onclick="setMode('human')">🌀 Humanizer</button>
-            <button class="mode-tab" id="imageTab" onclick="setMode('image')">🖼️ Image <span style="font-size:0.6em;background:#fef3c7;color:#92400e;padding:2px 5px;border-radius:4px;font-weight:700;">PRO</span></button>
+            <button class="mode-tab" id="imageTab" onclick="setMode('image')">🖼️ Image</button>
         </div>
         <div class="card-body">
             <!-- TEXT PANEL -->
@@ -553,11 +552,11 @@
                     <div class="file-drop-text">Drag & drop or <span>browse</span></div>
                     <div class="file-drop-hint">JPG, PNG, GIF, WEBP · Max 5MB</div>
                 </div>
-                <div class="upgrade-msg">🖼️ Image detection is a Pro feature. <a href="/upgrade">Upgrade</a> to unlock.</div>
+
             </div>
 
             <div class="action-row">
-                <div class="limits" id="limits">Free: 10 checks/day · <a href="/upgrade">Upgrade →</a></div>
+                <div class="limits" id="limits">Unlimited checks · 100% free</div>
                 <button class="btn-scan" id="scanBtn" onclick="runDetect()">🔍 Scan Now</button>
             </div>
         </div>
@@ -605,7 +604,7 @@
 </div>
 
 <footer>
-    Powered by Hugging Face & LanguageTool · <a href="/upgrade">Upgrade to Pro</a> for unlimited checks
+    Powered by Hugging Face & LanguageTool · 100% free
 </footer>
 
 <script>
@@ -887,9 +886,7 @@
         document.getElementById('scanBtn').disabled = false;
         if (status === 429) {
             document.getElementById('result').innerHTML = `
-                <div class="verdict-card">
-                    <div class="upgrade-msg">🔒 ${msg} · <a href="/upgrade">Upgrade to Pro →</a></div>
-                </div>`;
+                <div class="verdict-card"><div class="error-msg">⚠️ ${msg}</div></div>`;
         } else {
             document.getElementById('result').innerHTML = `
                 <div class="verdict-card"><div class="error-msg">⚠️ ${msg}</div></div>`;
@@ -1488,7 +1485,7 @@
         hideLoader();
         const resultDiv = document.getElementById('result');
         if (status === 429) {
-            resultDiv.innerHTML = `<div class="verdict-card"><div class="upgrade-msg">🔒 ${msg} · <a href="/upgrade">Upgrade to Pro →</a></div></div>`;
+            resultDiv.innerHTML = `<div class="verdict-card"><div class="error-msg">⚠️ ${msg}</div></div>`;
         } else {
             resultDiv.innerHTML = `<div class="verdict-card"><div class="error-msg">⚠️ ${msg}</div></div>`;
         }

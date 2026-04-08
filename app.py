@@ -25,23 +25,19 @@ app = Flask(__name__)
 
 HF_API_URL = "https://router.huggingface.co/hf-inference/models/openai-community/roberta-base-openai-detector"
 HF_API_KEY = os.environ.get("HF_API_KEY", "").strip()
-LEMONSQUEEZY_URL = os.environ.get("LEMONSQUEEZY_URL", "https://yourusername.lemonsqueezy.com/checkout/buy/YOUR-PRODUCT-ID")
-
-# Rate limiting: 10 free checks per IP per day
+# Rate limiting: effectively unlimited (99999/day)
 rate_limit = defaultdict(list)
-RATE_LIMIT_MAX = 10
+RATE_LIMIT_MAX = 99999
 RATE_LIMIT_WINDOW = timedelta(days=1)
 
 def get_client_ip():
     return request.headers.get("X-Forwarded-For", request.remote_addr).split(",")[0].strip()
 
 def check_rate_limit(ip):
-    now = datetime.utcnow()
-    rate_limit[ip] = [ts for ts in rate_limit[ip] if now - ts < RATE_LIMIT_WINDOW]
-    return RATE_LIMIT_MAX - len(rate_limit[ip])
+    return RATE_LIMIT_MAX
 
 def record_use(ip):
-    rate_limit[ip].append(datetime.utcnow())
+    pass
 
 def extract_text_from_pdf(file_stream) -> str:
     if PdfReader is None:
@@ -121,22 +117,10 @@ def index():
 def status():
     return jsonify({"status": "ok", "version": "1.1"})
 
-@app.route("/upgrade")
-def upgrade():
-    return redirect(LEMONSQUEEZY_URL, code=302)
-
 @app.route("/detect", methods=["POST"])
 def detect():
     ip = get_client_ip()
     remaining = check_rate_limit(ip)
-
-    if remaining <= 0:
-        return jsonify({
-            "error": "Daily limit reached",
-            "upgraded": False,
-            "upgrade_url": "/upgrade",
-            "message": "You've used all 10 free checks today. Upgrade for unlimited access."
-        }), 429
 
     text = request.json.get("text", "").strip()
     if not text:
@@ -145,7 +129,6 @@ def detect():
     if len(text) < 50:
         return jsonify({"error": "Text must be at least 50 characters"}), 400
 
-    record_use(ip)
     hf_headers = {"Authorization": f"Bearer {HF_API_KEY}", "Accept": "application/json"} if HF_API_KEY else {"Accept": "application/json"}
 
     try:
@@ -181,7 +164,6 @@ def detect():
                     "verdict": verdict,
                     "confidence": round(confidence, 1),
                     "status": "success",
-                    "remaining": remaining,
                     "text_length": len(text)
                 })
         else:
@@ -196,17 +178,6 @@ def detect():
 @app.route("/detect/file", methods=["POST"])
 def detect_file():
     """Handle document upload: PDF, DOCX, TXT. Runs sentence-level analysis."""
-    ip = get_client_ip()
-    remaining = check_rate_limit(ip)
-
-    if remaining <= 0:
-        return jsonify({
-            "error": "Daily limit reached",
-            "upgraded": False,
-            "upgrade_url": "/upgrade",
-            "message": "You've used all 10 free checks today."
-        }), 429
-
     if 'file' not in request.files:
         return jsonify({"error": "No file provided"}), 400
 
@@ -228,7 +199,6 @@ def detect_file():
     if len(text) > 10000:
         text = text[:10000]
 
-    record_use(ip)
     hf_headers = {"Authorization": f"Bearer {HF_API_KEY}", "Accept": "application/json"} if HF_API_KEY else {"Accept": "application/json"}
 
     # Overall score
@@ -268,7 +238,6 @@ def detect_file():
                     "verdict": verdict,
                     "confidence": round(confidence, 1),
                     "status": "success",
-                    "remaining": remaining,
                     "text_length": len(text),
                     "file_name": filename,
                     "sentences": sentence_results
@@ -285,16 +254,7 @@ def detect_file():
 @app.route("/paraphrase", methods=["POST"])
 def paraphrase():
     """Paraphrase text to sound more naturally human-written."""
-    ip = get_client_ip()
-    remaining = check_rate_limit(ip)
-
-    if remaining <= 0:
-        return jsonify({
-            "error": "Daily limit reached",
-            "upgrade_url": "/upgrade"
-        }), 429
-
-    data = request.json or {}
+    data = request.json or {})
     text = data.get("text", "").strip()
     level = data.get("level", "medium")  # light, medium, strong
 
@@ -318,8 +278,6 @@ def paraphrase():
         light = paraphrase(text, 'light')
         strong = paraphrase(text, 'strong')
 
-        record_use(ip)
-
         return jsonify({
             "original": text,
             "level": level,
@@ -327,7 +285,6 @@ def paraphrase():
             "light": light,
             "medium": variants[0] if variants else paraphrase(text, 'medium'),
             "strong": strong,
-            "remaining": check_rate_limit(ip),
             "status": "success"
         })
     except Exception as e:
@@ -336,25 +293,12 @@ def paraphrase():
 
 @app.route("/detect/image", methods=["POST"])
 def detect_image():
-    ip = get_client_ip()
-    remaining = check_rate_limit(ip)
-
-    if remaining <= 0:
-        return jsonify({
-            "error": "Daily limit reached",
-            "upgraded": False,
-            "upgrade_url": "/upgrade",
-            "message": "You've used all 10 free checks today."
-        }), 429
-
     if 'file' not in request.files:
         return jsonify({"error": "No image file provided"}), 400
 
     file = request.files['file']
     if not re.match(r'.*\.(jpg|jpeg|png|gif|webp)$', file.filename.lower()):
         return jsonify({"error": "Unsupported file type. Use JPG, PNG, GIF, or WEBP."}), 400
-
-    record_use(ip)
 
     HF_IMAGE_API_URL = os.environ.get("HF_IMAGE_API_URL", "").strip()
     if not HF_IMAGE_API_URL:
@@ -373,7 +317,6 @@ def detect_image():
         if resp.ok:
             result = resp.json()
             if isinstance(result, dict):
-                result["remaining"] = check_rate_limit(ip)
                 return jsonify(result)
             return jsonify({"error": "Unexpected response format"}), 502
         else:
@@ -487,12 +430,6 @@ def summarize():
 @app.route("/batch-detect", methods=["POST"])
 def batch_detect():
     """Process multiple text files at once."""
-    ip = get_client_ip()
-    remaining = check_rate_limit(ip)
-
-    if remaining <= 0:
-        return jsonify({"error": "Daily limit reached", "upgrade_url": "/upgrade"}), 429
-
     results = []
     files = request.files.getlist("files")
     if not files or len(files) == 0:
@@ -549,8 +486,7 @@ def batch_detect():
         except Exception as e:
             results.append({"filename": filename, "error": str(e)})
 
-    record_use(ip)
-    return jsonify({"status": "success", "results": results, "remaining": check_rate_limit(ip)})
+    return jsonify({"status": "success", "results": results})
 
 
 @app.route("/readability", methods=["POST"])
