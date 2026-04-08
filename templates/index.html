@@ -65,6 +65,124 @@
         .nav-links a:hover { color: var(--text); background: var(--bg); }
         .nav-cta { background: var(--accent) !important; color: #fff !important; padding: 8px 18px !important; border-radius: 10px !important; font-weight: 600 !important; }
         .nav-cta:hover { background: var(--accent-dark) !important; }
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            background: none;
+            border: none;
+            transition: background 0.2s;
+        }
+        .hamburger:hover { background: var(--bg); }
+        .hamburger span {
+            width: 22px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all 0.3s;
+            display: block;
+        }
+        .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .sidebar-overlay.show {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0; left: -280px;
+            width: 280px;
+            height: 100vh;
+            background: var(--surface);
+            z-index: 201;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar.open { left: 0; }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .sidebar-logo {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sidebar-logo span { color: var(--accent); }
+        .sidebar-close {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--muted);
+        }
+        .sidebar-close:hover { background: var(--border); color: var(--text); }
+        .sidebar-get-started {
+            display: block;
+            margin: 16px 20px;
+            background: var(--accent);
+            color: #fff;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+        .sidebar-get-started:hover { background: var(--accent-dark); }
+        .sidebar-section { padding: 8px 0; border-bottom: 1px solid var(--border); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .sidebar-link:hover { background: var(--bg); }
+        .sidebar-link-arrow {
+            color: var(--muted);
+            font-size: 0.75rem;
+        }
+        .sidebar-link.simple {
+            justify-content: flex-start;
+            gap: 8px;
+        }
+        .sidebar-divider { height: 1px; background: var(--border); margin: 8px 0; }
+
 
         /* Hero */
         .hero {
@@ -438,7 +556,56 @@
         <a href="#" onclick="showModal('howItWorksModal')">How it works</a>
         <a href="#" onclick="showModal('forEducatorsModal')">For Educators</a>
     </div>
+
+        <button class="hamburger" id="hamburgerBtn" onclick="openSidebar()" aria-label="Open menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
 </nav>
+
+
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <a href="/" class="sidebar-logo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="#3b82f6" stroke-width="2.5"/>
+                <path d="M8 12l3 3 5-5" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Human<span>Or</span>Not
+        </a>
+        <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+    </div>
+    <a href="/upgrade" class="sidebar-get-started">Get Started — 100% Free</a>
+    <div class="sidebar-section">
+        <a href="#" class="sidebar-link" onclick="toggleSubmenu('products')">Products <span class="sidebar-link-arrow">▾</span></a>
+        <a href="/detect" class="sidebar-link simple">→ AI Detection</a>
+        <a href="/humanizer" class="sidebar-link simple">→ Humanizer</a>
+        <a href="/grammar" class="sidebar-link simple">→ Grammar Check</a>
+    </div>
+    <div class="sidebar-section">
+        <a href="#" class="sidebar-link" onclick="toggleSubmenu('solutions')">Solutions <span class="sidebar-link-arrow">▾</span></a>
+        <a href="/educators" class="sidebar-link simple">→ For Educators</a>
+        <a href="/students" class="sidebar-link simple">→ For Students</a>
+        <a href="/writers" class="sidebar-link simple">→ For Writers</a>
+    </div>
+    <div class="sidebar-section">
+        <a href="/integrations" class="sidebar-link">Integrations <span class="sidebar-link-arrow">→</span></a>
+        <a href="/resources" class="sidebar-link">Resources <span class="sidebar-link-arrow">▾</span></a>
+        <a href="/pricing" class="sidebar-link">Pricing <span class="sidebar-link-arrow">→</span></a>
+    </div>
+    <div class="sidebar-section">
+        <a href="/news" class="sidebar-link">News</a>
+        <a href="/team" class="sidebar-link">Team</a>
+        <a href="/support" class="sidebar-link">Support</a>
+        <a href="/contact" class="sidebar-link">Contact Sales</a>
+    </div>
+</div>
 
 <div class="hero">
     <div class="hero-badge">🔬 AI Detection</div>
@@ -1590,6 +1757,24 @@
             document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show'));
         }
     });
+
+
+    function openSidebar() {
+        document.getElementById('sidebar').classList.add('open');
+        document.getElementById('sidebarOverlay').classList.add('show');
+        document.getElementById('hamburgerBtn').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('show');
+        document.getElementById('hamburgerBtn').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    function toggleSubmenu(id) {
+        // Simple toggle — can be expanded later
+        event.preventDefault();
+    }
 
     // data-action click handler — delegates to window-scoped functions
     document.addEventListener('click', (e) => {
