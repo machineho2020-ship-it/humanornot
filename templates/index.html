@@ -430,7 +430,7 @@
                     <button class="preset-btn" data-action="loadPreset('polished')">Polished by AI</button>
                 </div>
                 <div class="textarea-wrap">
-                    <textarea id="textInput" placeholder="Paste text here to detect AI-generated content... (minimum 50 characters)"></textarea>
+                    <textarea id="textInput" placeholder="Paste text here to detect AI-generated content... (minimum 50 characters)" oninput="updateCharCount(this.value.length)"></textarea>
                 </div>
                 <div class="char-count">
                     <span id="charStatus"></span>
@@ -608,6 +608,7 @@
 </footer>
 
 <script>
+    console.log("SCRIPT STARTED");
     let mode = 'text';
     let selectedFile = null;
     let selectedImage = null;
@@ -646,14 +647,14 @@
     });
 
     // Polling fallback for browser automation (input event may not fire)
-    let _lastLen = 0;
+    let _lastLen = -1;
     const _charPoll = setInterval(() => {
         const len = textarea.value.length;
         if (len !== _lastLen) {
             _lastLen = len;
             updateCharCount(len);
         }
-    }, 100);
+    }, 50);
 
     function loadPreset(key) {
         textarea.value = presets[key];
