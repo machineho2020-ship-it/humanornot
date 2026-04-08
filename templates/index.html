@@ -435,8 +435,8 @@
         Human<span>Or</span>Not
     </a>
     <div class="nav-links">
-        <a href="#" data-action="showModal('howItWorksModal')">How it works</a>
-        <a href="#" data-action="showModal('forEducatorsModal')">For Educators</a>
+        <a href="#" onclick="showModal('howItWorksModal')">How it works</a>
+        <a href="#" onclick="showModal('forEducatorsModal')">For Educators</a>
     </div>
 </nav>
 
@@ -449,27 +449,27 @@
 <div class="container">
     <div class="input-card">
         <div class="card-header">
-            <button class="mode-tab active" id="textTab" data-action="setMode('text')">✏️ Detect</button>
-            <button class="mode-tab" id="fileTab" data-action="setMode('file')">📄 Document</button>
-            <button class="mode-tab" id="vocabTab" data-action="setMode('vocab')">📝 Vocabulary</button>
-            <button class="mode-tab" id="grammarTab" data-action="setMode('grammar')">✅ Grammar</button>
-            <button class="mode-tab" id="sumTab" data-action="setMode('sum')">📋 Summarize</button>
-            <button class="mode-tab" id="citeTab" data-action="setMode('cite')">📚 Cite</button>
-            <button class="mode-tab" id="readTab" data-action="setMode('read')">📊 Readability</button>
-            <button class="mode-tab" id="humanTab" data-action="setMode('human')">🌀 Humanizer</button>
-            <button class="mode-tab" id="imageTab" data-action="setMode('image')">🖼️ Image</button>
+            <button class="mode-tab active" id="textTab" onclick="setMode('text')">✏️ Detect</button>
+            <button class="mode-tab" id="fileTab" onclick="setMode('file')">📄 Document</button>
+            <button class="mode-tab" id="vocabTab" onclick="setMode('vocab')">📝 Vocabulary</button>
+            <button class="mode-tab" id="grammarTab" onclick="setMode('grammar')">✅ Grammar</button>
+            <button class="mode-tab" id="sumTab" onclick="setMode('sum')">📋 Summarize</button>
+            <button class="mode-tab" id="citeTab" onclick="setMode('cite')">📚 Cite</button>
+            <button class="mode-tab" id="readTab" onclick="setMode('read')">📊 Readability</button>
+            <button class="mode-tab" id="humanTab" onclick="setMode('human')">🌀 Humanizer</button>
+            <button class="mode-tab" id="imageTab" onclick="setMode('image')">🖼️ Image</button>
         </div>
         <div class="card-body">
             <!-- TEXT PANEL -->
             <div id="textPanel">
                 <div class="presets">
                     <span style="font-size:0.75rem;font-weight:600;color:var(--muted);align-self:center;margin-right:4px;">Try:</span>
-                    <button class="preset-btn" data-action="loadPreset('chatgpt')">ChatGPT</button>
-                    <button class="preset-btn" data-action="loadPreset('claude')">Claude</button>
-                    <button class="preset-btn" data-action="loadPreset('human')">Human</button>
-                    <button class="preset-btn" data-action="loadPreset('ai-human')">AI + Human</button>
-                    <button class="preset-btn" data-action="loadPreset('paraphrased')">Paraphrased</button>
-                    <button class="preset-btn" data-action="loadPreset('polished')">Polished by AI</button>
+                    <button class="preset-btn" onclick="loadPreset('chatgpt')">ChatGPT</button>
+                    <button class="preset-btn" onclick="loadPreset('claude')">Claude</button>
+                    <button class="preset-btn" onclick="loadPreset('human')">Human</button>
+                    <button class="preset-btn" onclick="loadPreset('ai-human')">AI + Human</button>
+                    <button class="preset-btn" onclick="loadPreset('paraphrased')">Paraphrased</button>
+                    <button class="preset-btn" onclick="loadPreset('polished')">Polished by AI</button>
                 </div>
                 <div class="textarea-wrap">
                     <textarea id="textInput" placeholder="Paste text here to detect AI-generated content... (minimum 50 characters)" oninput="updateCharCount(this.value.length)"></textarea>
@@ -488,7 +488,7 @@
                 <div class="char-count"><span id="vocabCharCount">0</span> characters · Scans for 60+ common AI phrases</div>
                 <div class="action-row" style="margin-top:12px;">
                     <div class="limits">🔍 AI Vocabulary Scanner</div>
-                    <button class="btn-scan" data-action="runVocab()">Scan Vocabulary</button>
+                    <button class="btn-scan" onclick="runVocab()">Scan Vocabulary</button>
                 </div>
             </div>
 
@@ -500,7 +500,7 @@
                 <div class="char-count"><span id="grammarCharCount">0</span> characters · Powered by LanguageTool</div>
                 <div class="action-row" style="margin-top:12px;">
                     <div class="limits">✅ Grammar & Spelling Check</div>
-                    <button class="btn-scan" data-action="runGrammar()">Check Grammar</button>
+                    <button class="btn-scan" onclick="runGrammar()">Check Grammar</button>
                 </div>
             </div>
 
@@ -513,14 +513,14 @@
                 <div style="margin-top:12px;">
                     <div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px;font-weight:600;">Summary Length:</div>
                     <div class="sum-length-btns">
-                        <button class="sum-len-btn" data-action="setSumLen('short', this)">Short</button>
-                        <button class="sum-len-btn active" data-action="setSumLen('medium', this)">Medium</button>
-                        <button class="sum-len-btn" data-action="setSumLen('long', this)">Detailed</button>
+                        <button class="sum-len-btn" onclick="setSumLen('short', this)">Short</button>
+                        <button class="sum-len-btn active" onclick="setSumLen('medium', this)">Medium</button>
+                        <button class="sum-len-btn" onclick="setSumLen('long', this)">Detailed</button>
                     </div>
                 </div>
                 <div class="action-row" style="margin-top:12px;">
                     <div class="limits">📋 AI Summarizer</div>
-                    <button class="btn-scan" data-action="runSummarize()">Summarize</button>
+                    <button class="btn-scan" onclick="runSummarize()">Summarize</button>
                 </div>
             </div>
 
@@ -530,15 +530,15 @@
                     <input type="url" id="citeUrlInput" placeholder="Paste article or webpage URL..." style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;font-family:inherit;background:var(--bg);">
                 </div>
                 <div class="cite-format-btns">
-                    <button class="cite-fmt-btn active" data-action="setCiteFormat('apa', this)">APA</button>
-                    <button class="cite-fmt-btn" data-action="setCiteFormat('mla', this)">MLA</button>
-                    <button class="cite-fmt-btn" data-action="setCiteFormat('chicago', this)">Chicago</button>
-                    <button class="cite-fmt-btn" data-action="setCiteFormat('all', this)">All Formats</button>
+                    <button class="cite-fmt-btn active" onclick="setCiteFormat('apa', this)">APA</button>
+                    <button class="cite-fmt-btn" onclick="setCiteFormat('mla', this)">MLA</button>
+                    <button class="cite-fmt-btn" onclick="setCiteFormat('chicago', this)">Chicago</button>
+                    <button class="cite-fmt-btn" onclick="setCiteFormat('all', this)">All Formats</button>
                 </div>
                 <div id="citeResults"></div>
                 <div class="action-row" style="margin-top:12px;">
                     <div class="limits">📚 Citation Generator</div>
-                    <button class="btn-scan" data-action="runCite()">Generate Citation</button>
+                    <button class="btn-scan" onclick="runCite()">Generate Citation</button>
                 </div>
             </div>
 
@@ -550,14 +550,14 @@
                 <div style="margin-top:12px;">
                     <div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px;font-weight:600;">Humanization Level:</div>
                     <div class="sum-length-btns">
-                        <button class="sum-len-btn" data-action="setHumanLen('light', this)">Light</button>
-                        <button class="sum-len-btn active" data-action="setHumanLen('medium', this)">Medium</button>
-                        <button class="sum-len-btn" data-action="setHumanLen('strong', this)">Strong</button>
+                        <button class="sum-len-btn" onclick="setHumanLen('light', this)">Light</button>
+                        <button class="sum-len-btn active" onclick="setHumanLen('medium', this)">Medium</button>
+                        <button class="sum-len-btn" onclick="setHumanLen('strong', this)">Strong</button>
                     </div>
                 </div>
                 <div class="action-row" style="margin-top:12px;">
                     <div class="limits">🌀 Make AI text sound human — free, no API needed</div>
-                    <button class="btn-scan" id="runHumanizeBtn" data-action="runHumanize()" style="background:#10b981;box-shadow:0 4px 12px rgba(16,185,129,0.3);">🌀 Humanize Now</button>
+                    <button class="btn-scan" id="runHumanizeBtn" onclick="runHumanize()" style="background:#10b981;box-shadow:0 4px 12px rgba(16,185,129,0.3);">🌀 Humanize Now</button>
                 </div>
             </div>
 
@@ -569,13 +569,13 @@
                 <div class="char-count"><span id="readCharCount">0</span> characters</div>
                 <div class="action-row" style="margin-top:12px;">
                     <div class="limits">📊 Flesch-Kincaid · Coleman-Liau · SMOG · Sentence Analysis</div>
-                    <button class="btn-scan" data-action="runReadability()">Analyze Writing</button>
+                    <button class="btn-scan" onclick="runReadability()">Analyze Writing</button>
                 </div>
             </div>
 
             <!-- FILE PANEL -->
             <div id="filePanel" class="file-upload-wrap">
-                <div class="file-drop" id="fileDrop" data-action="document.getElementById('fileInput').click()">
+                <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
                     <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.txt" onchange="handleFile(this.files)" multiple>
                     <div class="file-drop-icon">📄</div>
                     <div class="file-drop-text">Drag & drop or <span>browse</span> · Multiple files supported</div>
@@ -587,7 +587,7 @@
 
             <!-- IMAGE PANEL -->
             <div id="imagePanel" class="image-upload-wrap">
-                <div class="image-drop" id="imageDrop" data-action="document.getElementById('imageInput').click()">
+                <div class="image-drop" id="imageDrop" onclick="document.getElementById('imageInput').click()">
                     <input type="file" id="imageInput" accept="image/*" onchange="handleImage(this.files[0])">
                     <img id="previewImg" class="preview-img" alt="Preview">
                     <div class="file-drop-icon">🖼️</div>
@@ -599,7 +599,7 @@
 
             <div class="action-row">
                 <div class="limits" id="limits">Unlimited checks · 100% free</div>
-                <button class="btn-scan" id="scanBtn" data-action="runDetect()">🔍 Scan Now</button>
+                <button class="btn-scan" id="scanBtn" onclick="runDetect()">🔍 Scan Now</button>
             </div>
         </div>
     </div>
@@ -923,9 +923,9 @@
                             <p>Rewrite text to sound more naturally human-written. Select intensity below.</p>
                         </div>
                         <div class="level-btns">
-                            <button class="level-btn" data-action="setParaLevel('light', this)">Light</button>
-                            <button class="level-btn active" data-action="setParaLevel('medium', this)">Medium</button>
-                            <button class="level-btn" data-action="setParaLevel('strong', this)">Strong</button>
+                            <button class="level-btn" onclick="setParaLevel('light', this)">Light</button>
+                            <button class="level-btn active" onclick="setParaLevel('medium', this)">Medium</button>
+                            <button class="level-btn" onclick="setParaLevel('strong', this)">Strong</button>
                         </div>
                     </div>
                     <button class="btn-scan" id="humanizeBtn" onclick="runParaphrase('${mode}')" style="width:100%;margin-top:8px;background:#10b981;box-shadow:0 4px 12px rgba(16,185,129,0.3);">
@@ -1617,7 +1617,7 @@
     <div class="modal">
         <div class="modal-header">
             <h2>How It Works</h2>
-            <button class="modal-close" data-action="closeModal('howItWorksModal')">✕</button>
+            <button class="modal-close" onclick="closeModal('howItWorksModal')">✕</button>
         </div>
         <div class="modal-body">
             <div class="hiw-step">
@@ -1657,7 +1657,7 @@
     <div class="modal">
         <div class="modal-header">
             <h2>For Educators</h2>
-            <button class="modal-close" data-action="closeModal('forEducatorsModal')">✕</button>
+            <button class="modal-close" onclick="closeModal('forEducatorsModal')">✕</button>
         </div>
         <div class="modal-body">
             <p><strong>HumanOrNot</strong> helps teachers, professors, and academic professionals detect AI-generated content in student submissions.</p>
