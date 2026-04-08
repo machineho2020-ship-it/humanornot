@@ -380,6 +380,48 @@
             .nav-links { display: none; }
             .mode-tab { font-size: 0.8rem; padding: 12px 8px; }
         }
+
+        /* Modals */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: var(--surface); border-radius: 16px; max-width: 560px; width: 100%;
+            max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+        }
+        .modal-header {
+            padding: 20px 24px 0; display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { font-size: 1.1rem; font-weight: 700; margin: 0; }
+        .modal-close {
+            background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+            padding: 6px 10px; cursor: pointer; font-size: 1rem; color: var(--muted);
+            transition: all 0.2s;
+        }
+        .modal-close:hover { background: var(--border); color: var(--text); }
+        .modal-body { padding: 16px 24px 24px; }
+        .modal-body p { font-size: 0.875rem; color: var(--text); line-height: 1.6; margin: 0 0 12px; }
+        .modal-body strong { color: var(--accent); }
+        .hiw-step {
+            display: flex; gap: 14px; align-items: flex-start; margin-bottom: 16px;
+            padding: 12px; background: var(--bg); border-radius: 10px;
+        }
+        .hiw-step-num {
+            background: var(--accent); color: #fff; font-weight: 800; font-size: 0.75rem;
+            width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; flex-shrink: 0;
+        }
+        .hiw-step h4 { font-size: 0.875rem; font-weight: 700; margin: 0 0 4px; }
+        .hiw-step p { font-size: 0.8rem; color: var(--muted); margin: 0; }
+        .edu-feature {
+            display: flex; gap: 10px; align-items: center; margin-bottom: 10px;
+        }
+        .edu-feature span { font-size: 1.1rem; }
+        .edu-feature p { font-size: 0.85rem; margin: 0; color: var(--text); }
     </style>
 </head>
 <body>
@@ -393,8 +435,8 @@
         Human<span>Or</span>Not
     </a>
     <div class="nav-links">
-        <a href="#">How it works</a>
-        <a href="#">For Educators</a>
+        <a href="#" data-action="showModal('howItWorksModal')">How it works</a>
+        <a href="#" data-action="showModal('forEducatorsModal')">For Educators</a>
     </div>
 </nav>
 
@@ -1529,6 +1571,26 @@
     window.hideLoader = hideLoader;
     window.useVariant = useVariant;
 
+    // Modal functions
+    window.showModal = function(id) {
+        document.getElementById(id).classList.add('show');
+    };
+    window.closeModal = function(id) {
+        document.getElementById(id).classList.remove('show');
+    };
+    // Close modal on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) overlay.classList.remove('show');
+        });
+    });
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show'));
+        }
+    });
+
     // data-action click handler — delegates to window-scoped functions
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-action]');
@@ -1551,4 +1613,63 @@
 </script>
 
 </body>
+<!-- Modals -->
+<div class="modal-overlay" id="howItWorksModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>How It Works</h2>
+            <button class="modal-close" data-action="closeModal('howItWorksModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="hiw-step">
+                <div class="hiw-step-num">1</div>
+                <div>
+                    <h4>Choose a Detection Mode</h4>
+                    <p>Paste text directly, upload a document (PDF/DOCX/TXT), or try a sample text with one click.</p>
+                </div>
+            </div>
+            <div class="hiw-step">
+                <div class="hiw-step-num">2</div>
+                <div>
+                    <h4>Scan with AI</h4>
+                    <p>Our Hugging Face model analyzes every sentence, flagging AI patterns with percentage confidence scores.</p>
+                </div>
+            </div>
+            <div class="hiw-step">
+                <div class="hiw-step-num">3</div>
+                <div>
+                    <h4>Get Color-Coded Results</h4>
+                    <p>Each sentence is highlighted — red for likely AI, green for human. See exactly where content was likely generated.</p>
+                </div>
+            </div>
+            <div class="hiw-step">
+                <div class="hiw-step-num">4</div>
+                <div>
+                    <h4>Use the Extra Tools</h4>
+                    <p>Check grammar, scan for AI vocabulary, summarize articles, generate citations, humanize AI text, and more — all free.</p>
+                </div>
+            </div>
+            <p style="margin-top:8px; color:var(--muted); font-size:0.8rem;">Powered by RoBERTa (Hugging Face) for AI detection and LanguageTool for grammar — no text is ever stored.</p>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="forEducatorsModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>For Educators</h2>
+            <button class="modal-close" data-action="closeModal('forEducatorsModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <p><strong>HumanOrNot</strong> helps teachers, professors, and academic professionals detect AI-generated content in student submissions.</p>
+            <div class="edu-feature"><span>🔍</span><p><strong>AI Detection</strong> — Spot AI-written essays, reports, and homework with sentence-level precision</p></div>
+            <div class="edu-feature"><span>📝</span><p><strong>AI Vocabulary Scan</strong> — Catch formulaic AI phrasing that students may not realize is a tell</p></div>
+            <div class="edu-feature"><span>✅</span><p><strong>Grammar Check</strong> — LanguageTool-powered proofreading for constructive student feedback</p></div>
+            <div class="edu-feature"><span>📋</span><p><strong>Summarizer</strong> — Quickly condense long readings or articles for class prep</p></div>
+            <div class="edu-feature"><span>📚</span><p><strong>Citation Generator</strong> — APA, MLA, Chicago — generate citations instantly from any URL</p></div>
+            <div class="edu-feature"><span>🔒</span><p><strong>100% Private</strong> — No text is stored. All processing happens in real-time.</p></div>
+            <p style="margin-top:8px; color:var(--muted); font-size:0.8rem;">Completely free for educators. No account required. No usage limits.</p>
+        </div>
+    </div>
+</div>
 </html>
